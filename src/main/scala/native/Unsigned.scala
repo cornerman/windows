@@ -1,6 +1,6 @@
 package scala.scalanative.native
 
-object Unsigned {
+object ToUnsigned {
   //TODO: how to do this properly:
   // https://github.com/scala-native/scala-native/issues/41
   implicit class LongToUnsigned(val num: Long) {
@@ -27,4 +27,12 @@ object Unsigned {
     def toUShort = new UShort(num.toShort)
     def toUByte = new UByte(num)
   }
+}
+
+object Unsigned {
+  //TODO: for now, don't use unsigned
+  type CULong = CLong
+  type CUInt = CInt
+  type CUShort = CShort
+  type CUChar = CChar
 }
