@@ -18,210 +18,187 @@ import scala.scalanative.native._, Unsigned._
   type xcb_keycode_t = CUChar
   type xcb_button_t = CUChar
 
-  @struct class xcb_setup_t {
-    val has_error: CInt = extern
-    val fd: CInt = extern
-    val status: CUChar = extern
-    val pad0: CUChar = extern
-    val protocol_major_version: CUChar = extern
-    val protocol_minor_version: CUChar = extern
-    val length: CUChar = extern
-    val release_number: CUInt = extern
-    val resource_id_base: CUInt = extern
-    val resource_id_mask: CUInt = extern
-    val motion_buffer_size: CUInt = extern
-    val vendor_len: CUChar = extern
-    val maximum_request_length: CUChar = extern
-    val roots_len: CUChar = extern
-    val pixmap_formats_len: CUChar = extern
-    val image_byte_order: CUChar = extern
-    val bitmap_format_bit_order: CUChar = extern
-    val bitmap_format_scanline_unit: CUChar = extern
-    val bitmap_format_scanline_pad: CUChar = extern
-    val min_keycode: xcb_keycode_t = extern
-    val max_keycode: xcb_keycode_t = extern
-    val pad1: CUChar = extern
-  }
+  @struct class xcb_setup_t(
+    val has_error: CInt,
+    val fd: CInt,
+    val status: CUChar,
+    val pad0: CUChar,
+    val protocol_major_version: CUChar,
+    val protocol_minor_version: CUChar,
+    val length: CUChar,
+    val release_number: CUInt,
+    val resource_id_base: CUInt,
+    val resource_id_mask: CUInt,
+    val motion_buffer_size: CUInt,
+    val vendor_len: CUChar,
+    val maximum_request_length: CUChar,
+    val roots_len: CUChar,
+    val pixmap_formats_len: CUChar,
+    val image_byte_order: CUChar,
+    val bitmap_format_bit_order: CUChar,
+    val bitmap_format_scanline_unit: CUChar,
+    val bitmap_format_scanline_pad: CUChar,
+    val min_keycode: xcb_keycode_t,
+    val max_keycode: xcb_keycode_t,
+    val pad1: CUChar)
 
-  @struct class xcb_connection_t {
-    val has_error: CInt = extern
-    val setup: Ptr[xcb_setup_t] = extern
-    val fd: CInt = extern
-    val iolock: Any = extern // TODO: pthread_mutex_t
-    val in: Any = extern // TODO: _xcb_in
-    val out: Any = extern // TODO: _xcb_out
-    val ext: Any = extern // TODO: _xcb_ext
-    val xid: Any = extern // TODO: _xcb_xid
-  }
+  @struct class xcb_connection_t(
+    val has_error: CInt,
+    val setup: Ptr[xcb_setup_t],
+    val fd: CInt,
+    val iolock: Any, // TODO: pthread_mutex_t
+    val in: Any, // TODO: _xcb_in
+    val out: Any, // TODO: _xcb_out
+    val ext: Any, // TODO: _xcb_ext
+    val xid: Any) // TODO: _xcb_xid
 
-  @struct class xcb_screen_t {
-    val root: xcb_window_t = extern
-    val default_colormap: xcb_colormap_t = extern
-    val white_pixel: CUInt = extern
-    val black_pixel: CUInt = extern
-    val current_input_masks: CUInt = extern
-    val width_in_pixels: CUShort = extern
-    val height_in_pixels: CUShort = extern
-    val width_in_millimeters: CUShort = extern
-    val height_in_millimeters: CUShort = extern
-    val min_installed_maps: CUShort = extern
-    val max_installed_maps: CUShort = extern
-    val root_visual: xcb_visualid_t = extern
-    val backing_stores: CUChar = extern
-    val save_unders: CUChar = extern
-    val root_depth: CUChar = extern
-    val allowed_depths_len: CUChar = extern
-  }
+  @struct class xcb_screen_t(
+    val root: xcb_window_t,
+    val default_colormap: xcb_colormap_t,
+    val white_pixel: CUInt,
+    val black_pixel: CUInt,
+    val current_input_masks: CUInt,
+    val width_in_pixels: CUShort,
+    val height_in_pixels: CUShort,
+    val width_in_millimeters: CUShort,
+    val height_in_millimeters: CUShort,
+    val min_installed_maps: CUShort,
+    val max_installed_maps: CUShort,
+    val root_visual: xcb_visualid_t,
+    val backing_stores: CUChar,
+    val save_unders: CUChar,
+    val root_depth: CUChar,
+    val allowed_depths_len: CUChar)
 
-  @struct class xcb_generic_event_t {
-    val response_type: CUChar = extern
-    val pad0: CUChar = extern
-    val sequence: CUShort = extern
-    val pad: Array[CUInt] = extern // length 7
-    val full_sequence: CUInt = extern
-  }
+  @struct class xcb_generic_event_t(
+    val response_type: CUChar,
+    val pad0: CUChar,
+    val sequence: CUShort,
+    val pad: Array[CUInt], // length 7
+    val full_sequence: CUInt)
 
-  @struct class xcb_button_press_event_t {
-    val response_type: CUChar = extern
-    val detail: xcb_button_t = extern
-    val sequence: CUShort = extern
-    val time: xcb_timestamp_t = extern
-    val root: xcb_window_t = extern
-    val event: xcb_window_t = extern
-    val child: xcb_window_t = extern
-    val root_x: CShort = extern
-    val root_y: CShort = extern
-    val event_x: CShort = extern
-    val event_y: CShort = extern
-    val state: CUShort = extern
-    val same_screen: CChar = extern
-    val pad0: CChar = extern
-  }
+  @struct class xcb_button_press_event_t(
+    val response_type: CUChar,
+    val detail: xcb_button_t,
+    val sequence: CUShort,
+    val time: xcb_timestamp_t,
+    val root: xcb_window_t,
+    val event: xcb_window_t,
+    val child: xcb_window_t,
+    val root_x: CShort,
+    val root_y: CShort,
+    val event_x: CShort,
+    val event_y: CShort,
+    val state: CUShort,
+    val same_screen: CChar,
+    val pad0: CChar)
 
-  @struct class xcb_button_release_event_t {
-    val response_type: CUChar = extern
-    val detail: xcb_button_t = extern
-    val sequence: CUShort = extern
-    val time: xcb_timestamp_t = extern
-    val root: xcb_window_t = extern
-    val event: xcb_window_t = extern
-    val child: xcb_window_t = extern
-    val root_x: CShort = extern
-    val root_y: CShort = extern
-    val event_x: CShort = extern
-    val event_y: CShort = extern
-    val state: CUShort = extern
-    val same_screen: CChar = extern
-    val pad0: CChar = extern
-  }
+  @struct class xcb_button_release_event_t(
+    val response_type: CUChar,
+    val detail: xcb_button_t,
+    val sequence: CUShort,
+    val time: xcb_timestamp_t,
+    val root: xcb_window_t,
+    val event: xcb_window_t,
+    val child: xcb_window_t,
+    val root_x: CShort,
+    val root_y: CShort,
+    val event_x: CShort,
+    val event_y: CShort,
+    val state: CUShort,
+    val same_screen: CChar,
+    val pad0: CChar)
 
-  @struct class xcb_key_press_event_t {
-    val response_type: CUChar = extern
-    val detail: xcb_keycode_t = extern
-    val sequence: CUShort = extern
-    val time: xcb_timestamp_t = extern
-    val root: xcb_window_t = extern
-    val event: xcb_window_t = extern
-    val child: xcb_window_t = extern
-    val root_x: CShort = extern
-    val root_y: CShort = extern
-    val event_x: CShort = extern
-    val event_y: CShort = extern
-    val state: CUShort = extern
-    val same_screen: CChar = extern
-    val pad0: CChar = extern
-  }
+  @struct class xcb_key_press_event_t(
+    val response_type: CUChar,
+    val detail: xcb_keycode_t,
+    val sequence: CUShort,
+    val time: xcb_timestamp_t,
+    val root: xcb_window_t,
+    val event: xcb_window_t,
+    val child: xcb_window_t,
+    val root_x: CShort,
+    val root_y: CShort,
+    val event_x: CShort,
+    val event_y: CShort,
+    val state: CUShort,
+    val same_screen: CChar,
+    val pad0: CChar)
 
-  @struct class xcb_key_release_event_t {
-    val response_type: CUChar = extern
-    val detail: xcb_keycode_t = extern
-    val sequence: CUShort = extern
-    val time: xcb_timestamp_t = extern
-    val root: xcb_window_t = extern
-    val event: xcb_window_t = extern
-    val child: xcb_window_t = extern
-    val root_x: CShort = extern
-    val root_y: CShort = extern
-    val event_x: CShort = extern
-    val event_y: CShort = extern
-    val state: CUShort = extern
-    val same_screen: CChar = extern
-    val pad0: CChar = extern
-  }
+  @struct class xcb_key_release_event_t(
+    val response_type: CUChar,
+    val detail: xcb_keycode_t,
+    val sequence: CUShort,
+    val time: xcb_timestamp_t,
+    val root: xcb_window_t,
+    val event: xcb_window_t,
+    val child: xcb_window_t,
+    val root_x: CShort,
+    val root_y: CShort,
+    val event_x: CShort,
+    val event_y: CShort,
+    val state: CUShort,
+    val same_screen: CChar,
+    val pad0: CChar)
 
-  @struct class xcb_motion_notify_event_t {
-    val response_type: CUChar = extern
-    val detail: CUChar = extern
-    val sequence: CUShort = extern
-    val time: xcb_timestamp_t = extern
-    val root: xcb_window_t = extern
-    val event: xcb_window_t = extern
-    val child: xcb_window_t = extern
-    val root_x: CShort = extern
-    val root_y: CShort = extern
-    val event_x: CShort = extern
-    val event_y: CShort = extern
-    val state: CUShort = extern
-    val same_screen: CChar = extern
-    val pad0: CChar = extern
-  }
+  @struct class xcb_motion_notify_event_t(
+    val response_type: CUChar,
+    val detail: CUChar,
+    val sequence: CUShort,
+    val time: xcb_timestamp_t,
+    val root: xcb_window_t,
+    val event: xcb_window_t,
+    val child: xcb_window_t,
+    val root_x: CShort,
+    val root_y: CShort,
+    val event_x: CShort,
+    val event_y: CShort,
+    val state: CUShort,
+    val same_screen: CChar,
+    val pad0: CChar)
 
-  @struct class xcb_void_cookie_t {
-    val sequence: CUInt = extern
-  }
+  @struct class xcb_void_cookie_t(val sequence: CUInt)
+  @struct class xcb_get_geometry_cookie_t(val sequence: CUInt)
+  @struct class xcb_grab_pointer_cookie_t(val sequence: CUInt)
+  @struct class xcb_query_pointer_cookie_t(val sequence: CUInt)
 
-  @struct class xcb_get_geometry_cookie_t {
-    val sequence: CUInt = extern
-  }
+  @struct class xcb_get_geometry_reply_t(
+    val response_type: CUChar,
+    val depth: CUChar,
+    val sequence: CUShort,
+    val length: CUInt,
+    val root: xcb_window_t,
+    val x: CShort,
+    val y: CShort,
+    val width: CUShort,
+    val height: CUShort,
+    val border_width: CUShort,
+    val pad0: Array[CUChar]) // length 2
 
-  @struct class xcb_grab_pointer_cookie_t {
-    val sequence: CUInt = extern
-  }
+  @struct class xcb_query_pointer_reply_t(
+    val response_type: CUChar,
+    val same_screen: CUChar,
+    val sequence: CUShort,
+    val length: CUInt,
+    val root: xcb_window_t,
+    val child: xcb_window_t,
+    val root_x: CShort,
+    val root_y: CShort,
+    val win_x: CShort,
+    val win_y: CShort,
+    val mask: CUShort,
+    val pad0: Array[CUChar]) // length 2
 
-  @struct class xcb_query_pointer_cookie_t {
-    val sequence: CUInt = extern
-  }
-
-  @struct class xcb_get_geometry_reply_t {
-    val response_type: CUChar = extern
-    val depth: CUChar = extern
-    val sequence: CUShort = extern
-    val length: CUInt = extern
-    val root: xcb_window_t = extern
-    val x: CShort = extern
-    val y: CShort = extern
-    val width: CUShort = extern
-    val height: CUShort = extern
-    val border_width: CUShort = extern
-    val pad0: Array[CUChar] = extern // length 2
-  }
-
-  @struct class xcb_query_pointer_reply_t {
-    val response_type: CUChar = extern
-    val same_screen: CUChar = extern
-    val sequence: CUShort = extern
-    val length: CUInt = extern
-    val root: xcb_window_t = extern
-    val child: xcb_window_t = extern
-    val root_x: CShort = extern
-    val root_y: CShort = extern
-    val win_x: CShort = extern
-    val win_y: CShort = extern
-    val mask: CUShort = extern
-    val pad0: Array[CUChar] = extern // length 2
-  }
-
-  @struct class xcb_generic_error_t {
-    val response_type: CUChar = extern
-    val error_code: CUChar = extern
-    val sequence: CUShort = extern
-    val resource_id: CUInt = extern
-    val minor_code: CUShort = extern
-    val major_code: CUChar = extern
-    val pad0: CUChar = extern
-    val pad: Array[CUInt] = extern // length 5
-    val full_sequence: CUInt = extern
-  }
+  @struct class xcb_generic_error_t(
+    val response_type: CUChar,
+    val error_code: CUChar,
+    val sequence: CUShort,
+    val resource_id: CUInt,
+    val minor_code: CUShort,
+    val major_code: CUChar,
+    val pad0: CUChar,
+    val pad: Array[CUInt], // length 5
+    val full_sequence: CUInt)
 
 
   def xcb_connect(displayname: CString, screenp: Ptr[Int]): Ptr[xcb_connection_t] = extern
