@@ -8,7 +8,7 @@ object Commands {
   def execute(cmd: CString) {
     if (fork() == 0) {
       setsid()
-      execl(c"/bin/sh", c"sh", c"-c", cmd)
+      execl(c"/bin/sh", c"sh", c"-c", cmd, 0)
     }
   }
 }
