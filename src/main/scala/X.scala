@@ -39,8 +39,10 @@ class X(conn: Ptr[xcb_connection_t]) {
   }
 
   def moveToPointer(win: xcb_window_t) {
-    val pointer = xcb_query_pointer_reply(conn, xcb_query_pointer(conn, root), null)
-    val geom = xcb_get_geometry_reply(conn, xcb_get_geometry(conn, win), null)
+    val pointerRequest = xcb_query_pointer(conn, root)
+    val geomRequest = xcb_get_geometry(conn, win)
+    val pointer = xcb_query_pointer_reply(conn, pointerRequest, null)
+    val geom = xcb_get_geometry_reply(conn, geomRequest, null)
     val values = createValues(2)
     //TODO: why do I need toInt all the time?
     values(0) = if ((!pointer).root_x.toInt + (!geom).width.toInt > (!screen).width_in_pixels.toInt) ((!screen).width_in_pixels.toInt - (!geom).width.toInt) else (!pointer).root_x
@@ -49,8 +51,10 @@ class X(conn: Ptr[xcb_connection_t]) {
   }
 
   def resizeToPointer(win: xcb_window_t) {
-    val pointer = xcb_query_pointer_reply(conn, xcb_query_pointer(conn, root), null)
-    val geom = xcb_get_geometry_reply(conn, xcb_get_geometry(conn, win), null)
+    val pointerRequest = xcb_query_pointer(conn, root)
+    val geomRequest = xcb_get_geometry(conn, win)
+    val pointer = xcb_query_pointer_reply(conn, pointerRequest, null)
+    val geom = xcb_get_geometry_reply(conn, geomRequest, null)
     val values = createValues(2)
     //TODO: why do I need toInt all the time?
     val xDiff = (!pointer).root_x.toInt - (!geom).x.toInt
@@ -64,7 +68,7 @@ class X(conn: Ptr[xcb_connection_t]) {
     xcb_ungrab_pointer(conn, XCB_CURRENT_TIME)
   }
 
-  def destroy(win: xcb_window_t) {
+  def destroyWindow(win: xcb_window_t) {
     xcb_destroy_window(conn, win)
   }
 

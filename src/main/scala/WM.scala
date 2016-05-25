@@ -35,7 +35,7 @@ class WM(conn: X) {
         if (keycode == Config.closeKey) {
           val win = (!e).child
           if (win != 0) {
-            conn.destroy(win)
+            conn.destroyWindow(win)
             conn.flush()
           }
         } else if (keycode == Config.execKey) {
