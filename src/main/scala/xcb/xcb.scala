@@ -2,6 +2,7 @@ package windows.xcb
 
 import scala.scalanative.native._, Unsigned._
 
+@link("xcb")
 @extern object XCB {
   type xcb_window_t = CUInt
   type xcb_pixmap_t = CUInt
