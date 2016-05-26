@@ -1,9 +1,0 @@
-lazy val windows =
-  project.in(file("windows")).
-    settings(libSettings).
-    settings(
-      nativeVerbose := true,
-      nativeClangOptions := Seq("-O2")
-    ).
-    dependsOn(scalalib)
-
