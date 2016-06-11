@@ -7,7 +7,7 @@ object Main {
   def main(args: Array[String]): Unit = X.connect match {
     case Some(conn) =>
       val wm = new WM(conn)
-      wm.registerKeys()
+      wm.grabKeys()
       while (true) {
         wm.tick()
       }

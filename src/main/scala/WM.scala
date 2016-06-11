@@ -78,12 +78,12 @@ class WM(conn: X) {
     }
   }
 
-  def registerKeys() {
-    conn.registerKey(Config.exitKey.toByte, Config.mod)
-    conn.registerKey(Config.closeKey.toByte, Config.mod)
-    conn.registerKey(Config.execKey.toByte, Config.mod)
-    conn.registerButton(Config.moveButton.toByte, Config.mod)
-    conn.registerButton(Config.resizeButton.toByte, Config.mod)
+  def grabKeys() {
+    conn.grabKey(Config.exitKey.toByte, Config.mod)
+    conn.grabKey(Config.closeKey.toByte, Config.mod)
+    conn.grabKey(Config.execKey.toByte, Config.mod)
+    conn.grabButton(Config.moveButton.toByte, Config.mod)
+    conn.grabButton(Config.resizeButton.toByte, Config.mod)
     conn.flush()
   }
 
