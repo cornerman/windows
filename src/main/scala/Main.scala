@@ -7,9 +7,7 @@ object Main {
     case Some(conn) =>
       val wm = new WM(conn)
       wm.grabKeys()
-      while (true) {
-        wm.tick()
-      }
+      wm.run()
     case None => fprintf(stderr, c"Error connecting to x")
   }
 }

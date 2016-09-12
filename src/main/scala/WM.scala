@@ -15,10 +15,10 @@ object Mode {
 }
 
 class WM(conn: X) {
-  var grabWindow = 0
+  var grabWindow = 0.toUInt
   var currentMode = Mode.Normal
 
-  def handleEvent(event: Event) {
+  def handleEvent(event: Ptr[xcb_generic_event_t]) {
     //TODO: broken match on extractors: https://github.com/scala-native/scala-native/issues/112
     // event match {
     //   case KeyPressEvent(e) =>
@@ -33,7 +33,7 @@ class WM(conn: X) {
         val keycode = (!e).detail
         if (keycode == Config.closeKey) {
           val win = (!e).child
-          if (win != 0) {
+          if (win != 0.toUInt) {
             conn.destroyWindow(win)
             conn.flush()
           }
@@ -50,7 +50,7 @@ class WM(conn: X) {
         val button = (!e).detail
         grabWindow = (!e).child
         currentMode = if (button == Config.moveButton) Mode.Move else if (button == Config.resizeButton) Mode.Resize else Mode.Normal
-        if (grabWindow != 0 && currentMode != Mode.Normal) {
+        if (grabWindow != 0.toUInt && currentMode != Mode.Normal) {
           if (currentMode == Mode.Move) conn.warpPointerForMove(grabWindow)
           else conn.warpPointerForResize(grabWindow)
           conn.grabPointer(grabWindow)
@@ -60,7 +60,7 @@ class WM(conn: X) {
     }
     ButtonReleaseEvent.unapply(event) match {
       case Some(e) =>
-        grabWindow = 0
+        grabWindow = 0.toUInt
         currentMode = Mode.Normal
         conn.ungrabPointer()
         conn.flush()
@@ -68,7 +68,7 @@ class WM(conn: X) {
     }
     MotionNotifyEvent.unapply(event) match {
       case Some(e) =>
-        if (grabWindow != 0 && currentMode != Mode.Normal) {
+        if (grabWindow != 0.toUInt && currentMode != Mode.Normal) {
           if (currentMode == Mode.Move) conn.moveToPointer(grabWindow)
           else conn.resizeToPointer(grabWindow)
           conn.flush()
@@ -78,16 +78,18 @@ class WM(conn: X) {
   }
 
   def grabKeys() {
-    conn.grabKey(Config.exitKey.toByte, Config.mod)
-    conn.grabKey(Config.closeKey.toByte, Config.mod)
-    conn.grabKey(Config.execKey.toByte, Config.mod)
-    conn.grabButton(Config.moveButton.toByte, Config.mod)
-    conn.grabButton(Config.resizeButton.toByte, Config.mod)
+    conn.grabKey(Config.exitKey, Config.mod)
+    conn.grabKey(Config.closeKey, Config.mod)
+    conn.grabKey(Config.execKey, Config.mod)
+    conn.grabButton(Config.moveButton, Config.mod)
+    conn.grabButton(Config.resizeButton, Config.mod)
     conn.flush()
   }
 
-  def tick() {
-    val ev = conn.waitForEvent()
-    handleEvent(ev)
+  def run() {
+    while (true) {
+      val ev = conn.waitForEvent()
+      handleEvent(ev)
+    }
   }
 }
