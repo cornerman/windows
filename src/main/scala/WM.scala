@@ -19,17 +19,8 @@ class WM(conn: X) {
   var currentMode = Mode.Normal
 
   def handleEvent(event: Event) {
-    //TODO: broken match on extractors: https://github.com/scala-native/scala-native/issues/112
-    // event match {
-    //   case KeyPressEvent(e) =>
-    //   case KeyReleaseEvent(e) =>
-    //   case ButtonPressEvent(e) =>
-    //   case ButtonReleaseEvent(e) =>
-    //   case MotionNotifyEvent(e) =>
-    //   case _ =>
-    // }
-    KeyPressEvent.unapply(event) match {
-      case Some(e) =>
+    event match {
+      case KeyPressEvent(e) =>
         val keycode = (!e).detail
         if (keycode == Config.closeKey) {
           val win = (!e).child
@@ -43,10 +34,8 @@ class WM(conn: X) {
           conn.disconnect()
           exit(1)
         }
-      case None =>
-    }
-    ButtonPressEvent.unapply(event) match {
-      case Some(e) =>
+      case KeyReleaseEvent(e) =>
+      case ButtonPressEvent(e) =>
         val button = (!e).detail
         grabWindow = (!e).child
         currentMode = if (button == Config.moveButton) Mode.Move else if (button == Config.resizeButton) Mode.Resize else Mode.Normal
@@ -56,24 +45,18 @@ class WM(conn: X) {
           conn.grabPointer(grabWindow)
           conn.flush()
         }
-      case None =>
-    }
-    ButtonReleaseEvent.unapply(event) match {
-      case Some(e) =>
+      case ButtonReleaseEvent(e) =>
         grabWindow = 0
         currentMode = Mode.Normal
         conn.ungrabPointer()
         conn.flush()
-      case None =>
-    }
-    MotionNotifyEvent.unapply(event) match {
-      case Some(e) =>
+      case MotionNotifyEvent(e) =>
         if (grabWindow != 0 && currentMode != Mode.Normal) {
           if (currentMode == Mode.Move) conn.moveToPointer(grabWindow)
           else conn.resizeToPointer(grabWindow)
           conn.flush()
         }
-      case None =>
+      case _ =>
     }
   }
 

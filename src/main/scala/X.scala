@@ -42,10 +42,9 @@ class X(conn: Ptr[xcb_connection_t]) {
     val pointer = xcb_query_pointer_reply(conn, pointerRequest, null)
     val geom = xcb_get_geometry_reply(conn, geomRequest, null)
     val values = createValues(2)
-    //TODO: why do I need toInt all the time?
-    values(0) = if ((!pointer).root_x.toInt + (!geom).width.toInt > (!screen).width_in_pixels.toInt) ((!screen).width_in_pixels.toInt - (!geom).width.toInt) else (!pointer).root_x
-    values(1) = if ((!pointer).root_y.toInt + (!geom).height.toInt > (!screen).height_in_pixels.toInt) ((!screen).height_in_pixels.toInt - (!geom).height.toInt) else (!pointer).root_y
-    xcb_configure_window(conn, win, (XCB_CONFIG_WINDOW_X.toInt | XCB_CONFIG_WINDOW_Y.toInt).toShort, values)
+    values(0) = if ((!pointer).root_x + (!geom).width > (!screen).width_in_pixels) ((!screen).width_in_pixels - (!geom).width) else (!pointer).root_x
+    values(1) = if ((!pointer).root_y + (!geom).height > (!screen).height_in_pixels) ((!screen).height_in_pixels - (!geom).height) else (!pointer).root_y
+    xcb_configure_window(conn, win, (XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y).toShort, values)
   }
 
   def resizeToPointer(win: xcb_window_t) {
@@ -54,12 +53,11 @@ class X(conn: Ptr[xcb_connection_t]) {
     val pointer = xcb_query_pointer_reply(conn, pointerRequest, null)
     val geom = xcb_get_geometry_reply(conn, geomRequest, null)
     val values = createValues(2)
-    //TODO: why do I need toInt all the time?
-    val xDiff = (!pointer).root_x.toInt - (!geom).x.toInt
-    val yDiff = (!pointer).root_y.toInt - (!geom).y.toInt
-    values(0) = if (xDiff > 0) xDiff else (!geom).width.toInt
-    values(1) = if (yDiff > 0) yDiff else (!geom).height.toInt
-    xcb_configure_window(conn, win, (XCB_CONFIG_WINDOW_WIDTH.toInt | XCB_CONFIG_WINDOW_HEIGHT.toInt).toShort, values)
+    val xDiff = (!pointer).root_x - (!geom).x
+    val yDiff = (!pointer).root_y - (!geom).y
+    values(0) = if (xDiff > 0) xDiff else (!geom).width
+    values(1) = if (yDiff > 0) yDiff else (!geom).height
+    xcb_configure_window(conn, win, (XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT).toShort, values)
   }
 
   def ungrabPointer() {
