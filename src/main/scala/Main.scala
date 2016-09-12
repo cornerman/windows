@@ -1,7 +1,6 @@
 package windows
 
-import scala.scalanative.native._
-import native.stdio._
+import scala.scalanative.native._, stdio._
 
 object Main {
   def main(args: Array[String]): Unit = X.connect match {

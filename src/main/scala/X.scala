@@ -1,8 +1,6 @@
 package windows
 
-import scala.scalanative.native._, Unsigned._
-import native.stdlib._
-import native.stdio._
+import scala.scalanative.native._, Unsigned._, stdlib._, stdio._
 import xcb._, XCB._
 
 class X(conn: Ptr[xcb_connection_t]) {

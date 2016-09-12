@@ -1,7 +1,6 @@
 package windows
 
-import scala.scalanative.native._
-import native._, stdlib._
+import scala.scalanative.native._, stdlib._
 import xcb._, XCB._
 
 //TODO: enum
