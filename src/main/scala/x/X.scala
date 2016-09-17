@@ -1,6 +1,7 @@
-package windows
+package windows.x
 
-import scala.scalanative.native._, Unsigned._, stdlib._, stdio._
+import scala.scalanative.native._, stdlib._, stdio._
+import Unsigned._
 import xcb._, XCB._
 
 class X(conn: Ptr[xcb_connection_t]) {
@@ -11,6 +12,21 @@ class X(conn: Ptr[xcb_connection_t]) {
 
   def disconnect(): Unit = xcb_disconnect(conn)
   def flush(): Unit = xcb_flush(conn)
+
+  def registerEvents() {
+    // val mask = XCB_CW_EVENT_MASK
+    // val values = createValues(1)
+    // values(0) = XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT
+    //             //XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY
+    //             // XCB_EVENT_MASK_ENTER_WINDOW |
+    //             // XCB_EVENT_MASK_LEAVE_WINDOW |
+    //             // XCB_EVENT_MASK_STRUCTURE_NOTIFY |
+    //             // XCB_EVENT_MASK_PROPERTY_CHANGE |
+    //             // XCB_EVENT_MASK_FOCUS_CHANGE
+
+    // xcb_change_window_attributes(conn, root, mask, values);
+    // free(values)
+  }
 
   def grabKey(keycode: xcb_keycode_t, modMask: CUShort) {
     xcb_grab_key(conn, 0, root, modMask, keycode, XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC)
@@ -34,6 +50,7 @@ class X(conn: Ptr[xcb_connection_t]) {
     values(0) = XCB_STACK_MODE_ABOVE
     xcb_configure_window(conn, win, XCB_CONFIG_WINDOW_STACK_MODE, values)
     xcb_grab_pointer(conn, 0, root, (XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_BUTTON_MOTION | XCB_EVENT_MASK_POINTER_MOTION_HINT).toShort, XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC, root, XCB_NONE, XCB_CURRENT_TIME)
+    free(values)
   }
 
   def moveToPointer(win: xcb_window_t) {
@@ -45,6 +62,7 @@ class X(conn: Ptr[xcb_connection_t]) {
     values(0) = if ((!pointer).root_x + (!geom).width > (!screen).width_in_pixels) ((!screen).width_in_pixels - (!geom).width) else (!pointer).root_x
     values(1) = if ((!pointer).root_y + (!geom).height > (!screen).height_in_pixels) ((!screen).height_in_pixels - (!geom).height) else (!pointer).root_y
     xcb_configure_window(conn, win, (XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y).toShort, values)
+    free(values)
   }
 
   def resizeToPointer(win: xcb_window_t) {
@@ -58,6 +76,7 @@ class X(conn: Ptr[xcb_connection_t]) {
     values(0) = if (xDiff > 0) xDiff else (!geom).width
     values(1) = if (yDiff > 0) yDiff else (!geom).height
     xcb_configure_window(conn, win, (XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT).toShort, values)
+    free(values)
   }
 
   def ungrabPointer() {
@@ -68,11 +87,7 @@ class X(conn: Ptr[xcb_connection_t]) {
     xcb_destroy_window(conn, win)
   }
 
-  def waitForEvent(): Event = {
-    val ev = xcb_wait_for_event(conn)
-    val response = (!ev).response_type & ~0x80
-    Event(response, ev)
-  }
+  def waitForEvent() = xcb_wait_for_event(conn)
 }
 
 object X {

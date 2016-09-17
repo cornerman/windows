@@ -1,7 +1,7 @@
-package windows
+package windows.system
 
 import scala.scalanative.native._
-import native.unistd._
+import windows.native.unistd._
 
 object Commands {
   def execute(cmd: String) {

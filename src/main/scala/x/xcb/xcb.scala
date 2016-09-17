@@ -1,4 +1,4 @@
-package windows.xcb
+package windows.x.xcb
 
 import scala.scalanative.native._, Unsigned._
 
@@ -158,6 +158,22 @@ import scala.scalanative.native._, Unsigned._
     val same_screen: CChar,
     val pad0: CChar)
 
+  @struct class xcb_map_request_event_t(
+    val response_type: CUChar,
+    val pad0: CUChar,
+    val sequence: CUShort,
+    val parent: xcb_window_t,
+    val window: xcb_window_t)
+
+  @struct class xcb_unmap_notify_event_t(
+    val response_type: CUChar,
+    val pad0: CUChar,
+    val sequence: CUShort,
+    val event: xcb_window_t,
+    val window: xcb_window_t,
+    val from_configure: CUChar,
+    val pad1: Array[CUChar]) // length 3
+
   @struct class xcb_void_cookie_t(val sequence: CUInt)
   @struct class xcb_get_geometry_cookie_t(val sequence: CUInt)
   @struct class xcb_grab_pointer_cookie_t(val sequence: CUInt)
@@ -216,6 +232,7 @@ import scala.scalanative.native._, Unsigned._
   def xcb_poll_for_event(c: Ptr[xcb_connection_t]): Ptr[xcb_generic_event_t] = extern
 
   def xcb_configure_window(conn: Ptr[xcb_connection_t], window: xcb_window_t, value_mask: CUShort, value_list: Ptr[CUInt]): xcb_void_cookie_t = extern //TODO value_list: Array[CUInt] (implementation of Array/List missing?)
+  def xcb_change_window_attributes(conn: Ptr[xcb_connection_t], window: xcb_window_t, value_mask: CUInt, value_list: Ptr[CUInt]): xcb_void_cookie_t = extern
   def xcb_destroy_window(conn: Ptr[xcb_connection_t], window: xcb_window_t): xcb_void_cookie_t = extern
 
   def xcb_get_geometry(conn: Ptr[xcb_connection_t], drawable: xcb_drawable_t): xcb_get_geometry_cookie_t = extern

@@ -1,4 +1,4 @@
-package windows
+package windows.x
 
 package object xcb {
   //TODO enum: xcb_mod_mask_t {
@@ -237,5 +237,31 @@ package object xcb {
   val XCB_SET_MODIFIER_MAPPING = 118.toByte
   val XCB_GET_MODIFIER_MAPPING = 119.toByte
   val XCB_NO_OPERATION = 127.toByte
+
+  // typedef enum xcb_window_class_t {
+  val XCB_WINDOW_CLASS_COPY_FROM_PARENT = 0.toByte
+  val XCB_WINDOW_CLASS_INPUT_OUTPUT = 1.toByte
+  val XCB_WINDOW_CLASS_INPUT_ONLY = 2.toByte
+
+  // typedef enum xcb_cw_t {
+  val XCB_CW_BACK_PIXMAP = 1.toShort
+  val XCB_CW_BACK_PIXEL = 2.toShort
+  val XCB_CW_BORDER_PIXMAP = 4.toShort
+  val XCB_CW_BORDER_PIXEL = 8.toShort
+  val XCB_CW_BIT_GRAVITY = 16.toShort
+  val XCB_CW_WIN_GRAVITY = 32.toShort
+  val XCB_CW_BACKING_STORE = 64.toShort
+  val XCB_CW_BACKING_PLANES = 128.toShort
+  val XCB_CW_BACKING_PIXEL = 256.toShort
+  val XCB_CW_OVERRIDE_REDIRECT = 512.toShort
+  val XCB_CW_SAVE_UNDER = 1024.toShort
+  val XCB_CW_EVENT_MASK = 2048.toShort
+  val XCB_CW_DONT_PROPAGATE = 4096.toShort
+  val XCB_CW_COLORMAP = 8192.toShort
+  val XCB_CW_CURSOR = 16384.toShort
+
+  //typedef enum xcb_back_pixmap_t {
+  val XCB_BACK_PIXMAP_NONE = 0.toByte
+  val XCB_BACK_PIXMAP_PARENT_RELATIVE = 1.toByte
 }
 
