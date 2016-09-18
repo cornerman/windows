@@ -22,12 +22,9 @@ object Reactor {
       case ButtonPressEvent(window, config.moveButton) => MouseMoving(window)
       case ButtonPressEvent(window, config.resizeButton) => MouseResizing(window)
     }
-    case MapRequestEvent(_) =>
-      println("maprequest")
-      None
-    case UnmapNotifyEvent(_) =>
-      println("unmapnotify")
-      None
+    case MapRequestEvent(window) => Some(ManageWindow(window))
+    case MapNotifyEvent(window) => Some(MappedWindow(window))
+    case UnmapNotifyEvent(window) => Some(UnmappedWindow(window))
     case _ => None
   }
 }

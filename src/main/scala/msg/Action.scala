@@ -21,11 +21,17 @@ case class MouseMoving(window: Int) extends ConnectionAction
 case class MouseResizeEnd(window: Int) extends ConnectionAction
 case class MouseMoveEnd(window: Int) extends ConnectionAction
 case class Configure(config: Config) extends ConnectionAction
+case class ManageWindow(window: Int) extends ConnectionAction
+
+//TODO: only for interpreter? more generic actiondispatch for interpreter?
+case class MappedWindow(window: Int) extends Action
+case class UnmappedWindow(window: Int) extends Action
 
 object ActionDispatch {
   def apply(system: SystemAction => Unit, connection: ConnectionAction => Unit)(action: Action) = action match {
     case a: CombinedAction => connection(a); system(a)
     case a: ConnectionAction => connection(a)
     case a: SystemAction => system(a)
+    case _ => ()
   }
 }

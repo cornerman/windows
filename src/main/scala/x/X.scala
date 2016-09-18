@@ -14,18 +14,18 @@ class X(conn: Ptr[xcb_connection_t]) {
   def flush(): Unit = xcb_flush(conn)
 
   def registerEvents() {
-    // val mask = XCB_CW_EVENT_MASK
-    // val values = createValues(1)
-    // values(0) = XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT
-    //             //XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY
-    //             // XCB_EVENT_MASK_ENTER_WINDOW |
-    //             // XCB_EVENT_MASK_LEAVE_WINDOW |
-    //             // XCB_EVENT_MASK_STRUCTURE_NOTIFY |
-    //             // XCB_EVENT_MASK_PROPERTY_CHANGE |
-    //             // XCB_EVENT_MASK_FOCUS_CHANGE
+    val mask = XCB_CW_EVENT_MASK
+    val values = createValues(1)
+    values(0) = XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT |
+                XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY
+                // XCB_EVENT_MASK_ENTER_WINDOW |
+                // XCB_EVENT_MASK_LEAVE_WINDOW |
+                // XCB_EVENT_MASK_STRUCTURE_NOTIFY |
+                // XCB_EVENT_MASK_PROPERTY_CHANGE |
+                // XCB_EVENT_MASK_FOCUS_CHANGE
 
-    // xcb_change_window_attributes(conn, root, mask, values);
-    // free(values)
+    xcb_change_window_attributes(conn, root, mask, values);
+    free(values)
   }
 
   def grabKey(keycode: xcb_keycode_t, modMask: CUShort) {
@@ -34,6 +34,10 @@ class X(conn: Ptr[xcb_connection_t]) {
 
   def grabButton(button: xcb_button_t, modMask: CUShort) {
     xcb_grab_button(conn, 0, root, (XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE).toShort, XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC, root, XCB_NONE, button, modMask)
+  }
+
+  def manageWindow(win: xcb_window_t) {
+    xcb_map_window(conn, win)
   }
 
   def warpPointerForResize(win: xcb_window_t) {

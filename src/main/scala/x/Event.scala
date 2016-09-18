@@ -34,6 +34,10 @@ object MapRequestEvent {
   def unapply(e: EventPtr) = as[xcb_map_request_event_t](e, XCB_MAP_REQUEST)
 }
 
+object MapNotifyEvent {
+  def unapply(e: EventPtr) = as[xcb_map_notify_event_t](e, XCB_MAP_NOTIFY)
+}
+
 object UnmapNotifyEvent {
   def unapply(e: EventPtr) = as[xcb_unmap_notify_event_t](e, XCB_UNMAP_NOTIFY)
 }

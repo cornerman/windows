@@ -4,8 +4,14 @@ import windows.msg._
 
 object Tiling {
   def interpret(s: State, action: Action) = action match {
-    // case AddWindow(window) => s.copy(windows = s.windows :+ window)
-    // case RemoveWindow(window) => s.copy(windows = s.windows - window)
+    case MappedWindow(window) =>
+      println("mapped")
+      println(window)
+      s.copy(windows = s.windows :+ window)
+    case UnmappedWindow(window) =>
+      println("unmapped")
+      println(window)
+      s.copy(windows = s.windows.filterNot(_ == window))
     case _ => s
   }
 }

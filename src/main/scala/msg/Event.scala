@@ -11,4 +11,5 @@ case class KeyPressEvent(window: Int, key: Int) extends Event
 case class KeyReleaseEvent(window: Int, key: Int) extends Event
 case class MotionNotifyEvent(window: Int) extends Event
 case class MapRequestEvent(window: Int) extends Event
+case class MapNotifyEvent(window: Int) extends Event
 case class UnmapNotifyEvent(window: Int) extends Event
