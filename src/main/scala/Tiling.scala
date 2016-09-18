@@ -3,7 +3,7 @@ package windows
 import windows.msg._
 
 object Tiling {
-  def interpret(s: State, action: Action) = action match {
+  def interpret(s: State, action: InterpreterAction) = action match {
     case MappedWindow(window) =>
       println("mapped")
       println(window)
@@ -12,6 +12,5 @@ object Tiling {
       println("unmapped")
       println(window)
       s.copy(windows = s.windows.filterNot(_ == window))
-    case _ => s
   }
 }

@@ -3,7 +3,7 @@ package windows.x
 import windows.msg._
 
 object XAdapter {
-  def act(conn: X)(action: ConnectionAction): Unit = action match {
+  def act(conn: X)(action: ConnectionAction): Option[String] = action match {
     case Configure(config) => import config._
       println("configure")
       conn.registerEvents()
@@ -13,52 +13,64 @@ object XAdapter {
       conn.grabButton(moveButton.toByte, mod)
       conn.grabButton(resizeButton.toByte, mod)
       conn.flush()
+      None
     case Exit(reason) =>
       println("exit")
       conn.disconnect()
+      None
     case Close(window) =>
       println("close")
       println(window)
       conn.destroyWindow(window)
       conn.flush()
+      None
     case MouseMoveStart(window) if window != 0 =>
       println("movestart")
       println(window)
       conn.warpPointerForMove(window)
       conn.grabPointer(window)
       conn.flush()
+      None
     case MouseResizeStart(window) if window != 0 =>
       println("resizestart")
       println(window)
       conn.warpPointerForResize(window)
       conn.grabPointer(window)
       conn.flush()
+      None
     case MouseMoving(window) if window != 0 =>
       println("moving")
       println(window)
       conn.moveToPointer(window)
       conn.flush()
+      None
     case MouseResizing(window) if window != 0 =>
       println("resizing")
       println(window)
       conn.resizeToPointer(window)
       conn.flush()
+      None
     case MouseMoveEnd(window) if window != 0 =>
       println("moveend")
       println(window)
       conn.ungrabPointer()
       conn.flush()
+      None
     case MouseResizeEnd(window) if window != 0 =>
       println("resizeend")
       println(window)
       conn.ungrabPointer()
       conn.flush()
+      None
     case ManageWindow(window) =>
       println("manage")
       println(window)
       conn.manageWindow(window)
       conn.flush()
-    case _ => println("ignored action")
+      None
+    case _ =>
+      println("ignored action")
+      None
   }
 
   def run(conn: X)(handler: Event => Unit) = while(true) {
