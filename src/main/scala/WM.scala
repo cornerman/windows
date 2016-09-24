@@ -1,16 +1,14 @@
 package windows
 
 import windows.msg._
-import windows.system.SystemAdapter
-import scalanative.native.stdio._
+
+object MyConfig extends Config
 
 object WM {
   def run(config: Config,
-          runner: (Event => Unit) => Unit,
+          runner: (Event => Unit) => Option[String],
           reactor: (Config, Mode, Event) => Option[Action],
-          dispatcher: (State, Action) => State) {
-
-    setvbuf(stdout, null, _IOLBF, 0) // line buffered
+          dispatcher: (State, Action) => State): Option[String] = {
 
     var mode = Mode.initial
     var state = State.initial(config)
@@ -30,9 +28,9 @@ object WM {
     }
   }
 
-  def run(runner: (Event => Unit) => Unit, act: ConnectionAction => Option[String]) {
+  def run(runner: (Event => Unit) => Option[String], act: ConnectionAction => Option[String]): Option[String] = {
     import ActionDispatch._
-    val dispatcher = chain(onConnection(act), onSystem(SystemAdapter.act), onInterpreter(Tiling.interpret)) _
-    run(MyConfig, runner, Reactor.react, dispatcher)
+    val dispatcher = chain(onConnection(act), onInterpreter(Tiling.interpret)) _
+    run(MyConfig, runner, Reactor.react _, dispatcher)
   }
 }

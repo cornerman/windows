@@ -28,11 +28,11 @@ class X(conn: Ptr[xcb_connection_t]) {
     free(values)
   }
 
-  def grabKey(keycode: xcb_keycode_t, modMask: CUShort) {
+  def grabKey(keycode: xcb_keycode_t, modMask: xcb_mod_mask_t) {
     xcb_grab_key(conn, 0, root, modMask, keycode, XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC)
   }
 
-  def grabButton(button: xcb_button_t, modMask: CUShort) {
+  def grabButton(button: xcb_button_t, modMask: xcb_mod_mask_t) {
     xcb_grab_button(conn, 0, root, (XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE).toShort, XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC, root, XCB_NONE, button, modMask)
   }
 

@@ -2,6 +2,7 @@ package windows.x
 
 package object xcb {
   //TODO enum: xcb_mod_mask_t {
+  type xcb_mod_mask_t = Short
   val XCB_MOD_MASK_SHIFT = 1.toShort
   val XCB_MOD_MASK_LOCK = 2.toShort
   val XCB_MOD_MASK_CONTROL = 4.toShort

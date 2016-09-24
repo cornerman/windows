@@ -14,7 +14,7 @@ object Mode {
   def initial = Mode(None, None)
 }
 
-case class State(config: Config, windows: Seq[Int], errors: Seq[String]) {
+case class State(config: Config, windows: Seq[Long], errors: Seq[String]) {
   def error(msg: String) = copy(errors = errors :+ msg)
 }
 object State {

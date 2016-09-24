@@ -6,23 +6,22 @@ package windows.msg
 sealed trait Action
 
 sealed trait ConnectionAction extends Action
-sealed trait SystemAction extends Action
 sealed trait InterpreterAction extends Action
 
-case class Command(cmd: String) extends SystemAction
-case class Exit(reason: String) extends SystemAction with ConnectionAction
-case class Close(window: Int) extends ConnectionAction
-case class MouseResizeStart(window: Int) extends ConnectionAction
-case class MouseMoveStart(window: Int) extends ConnectionAction
-case class MouseResizing(window: Int) extends ConnectionAction
-case class MouseMoving(window: Int) extends ConnectionAction
-case class MouseResizeEnd(window: Int) extends ConnectionAction
-case class MouseMoveEnd(window: Int) extends ConnectionAction
+case class Command(cmd: String) extends ConnectionAction
+case class Exit(reason: String) extends ConnectionAction
+case class Close(window: Long) extends ConnectionAction
+case class MouseResizeStart(window: Long) extends ConnectionAction
+case class MouseMoveStart(window: Long) extends ConnectionAction
+case class MouseResizing(window: Long) extends ConnectionAction
+case class MouseMoving(window: Long) extends ConnectionAction
+case class MouseResizeEnd(window: Long) extends ConnectionAction
+case class MouseMoveEnd(window: Long) extends ConnectionAction
 case class Configure(config: Config) extends ConnectionAction
-case class ManageWindow(window: Int) extends ConnectionAction
+case class ManageWindow(window: Long) extends ConnectionAction
 
-case class MappedWindow(window: Int) extends InterpreterAction
-case class UnmappedWindow(window: Int) extends InterpreterAction
+case class MappedWindow(window: Long) extends InterpreterAction
+case class UnmappedWindow(window: Long) extends InterpreterAction
 
 object ActionDispatch {
   def chain(handlers: ((State, Action) => State)*)(initialState: State, action: Action): State = {
@@ -43,10 +42,6 @@ object ActionDispatch {
 
   def onInterpreter(handler: (State, InterpreterAction) => State) = {
     onStateAction { case (s, a: InterpreterAction)  => handler(s, a) } _
-  }
-
-  def onSystem(handler: SystemAction => Option[String]) = {
-    onAction { case a: SystemAction => handler(a) } _
   }
 
   def onConnection(handler: ConnectionAction => Option[String]) = {
