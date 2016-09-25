@@ -5,11 +5,9 @@ import windows.msg._
 import scala.scalanative.native._
 import windows.system.Commands
 import wlc._, WLC._
-import Modifier._
 
-object WaylandAdapter {
-
-  var handler: Event => Unit = _
+object WLCHelper {
+  import windows.msg.Modifier, Modifier._
 
   def activeMods(modByte: wlc_modifier_bit): Set[Modifier] = {
     Modifier.values.filterNot(_ == Lock).flatMap { mod =>
@@ -30,6 +28,10 @@ object WaylandAdapter {
     case Mod4 => WLC_BIT_MOD_LOGO
     case Mod5 => WLC_BIT_MOD_MOD5
   }
+}
+
+object WaylandAdapter {
+  import WLCHelper._
 
   def act(action: ConnectionAction): Option[String] = action match {
     case Configure(config) =>
@@ -87,10 +89,12 @@ object WaylandAdapter {
       None
   }
 
+  var handler: Event => Unit = _
   def run(handler: Event => Unit): Option[String] = {
+    //TODO closure broken
     this.handler = handler
 
-    //TODO: why need to inline? also closure broken?
+    //TODO: why need to inline?
     wlc_log_set_handler((logType: wlc_log_type, msg: CString) => {
       println(fromCString(msg))
     })
@@ -159,6 +163,7 @@ object WaylandAdapter {
       })
 
     wlc_set_pointer_motion_cb((view: wlc_handle, time: Int, point: Ptr[wlc_point]) => {
+      println("pointer motion")
       this.handler(MotionNotifyEvent(view))
       true
     })

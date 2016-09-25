@@ -1,5 +1,6 @@
 package windows.msg
 
+//TODO seq of keys/buttons
 case class Mode(key: Option[KeyPressEvent], button: Option[ButtonPressEvent]) {
   def update(event: Event) = event match {
     case e: KeyPressEvent => copy(key = Some(e))
