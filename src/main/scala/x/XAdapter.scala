@@ -10,6 +10,7 @@ object XAdapter {
     case Configure(config) => import config._
       println("configure")
       conn.registerEvents()
+      conn.grabPointer()
       conn.grabKey(exitKey.toByte, translateMod(mod))
       conn.grabKey(closeKey.toByte, translateMod(mod))
       conn.grabKey(execKey.toByte, translateMod(mod))
@@ -34,48 +35,31 @@ object XAdapter {
       conn.destroyWindow(window)
       conn.flush()
       None
-    case MouseMoveStart(window) if window != 0 =>
-      println("movestart")
+    case WarpPointer(window, x, y) =>
+      println("warppointer")
       println(window)
-      conn.warpPointerForMove(window)
-      conn.grabPointer(window)
+      conn.warpPointer(window, x, y)
       conn.flush()
       None
-    case MouseResizeStart(window) if window != 0 =>
-      println("resizestart")
-      println(window)
-      conn.warpPointerForResize(window)
-      conn.grabPointer(window)
-      conn.flush()
-      None
-    case MouseMoving(window) if window != 0 =>
+    case MoveWindow(window, x, y) if window != 0 =>
       println("moving")
       println(window)
-      conn.moveToPointer(window)
+      conn.bringToFront(window)
+      conn.moveWindow(window, x, y)
       conn.flush()
       None
-    case MouseResizing(window) if window != 0 =>
+    case ResizeWindow(window, x, y) if window != 0 =>
       println("resizing")
       println(window)
-      conn.resizeToPointer(window)
-      conn.flush()
-      None
-    case MouseMoveEnd(window) if window != 0 =>
-      println("moveend")
-      println(window)
-      conn.ungrabPointer()
-      conn.flush()
-      None
-    case MouseResizeEnd(window) if window != 0 =>
-      println("resizeend")
-      println(window)
-      conn.ungrabPointer()
+      conn.bringToFront(window)
+      conn.resizeWindow(window, x, y)
       conn.flush()
       None
     case ManageWindow(window) =>
       println("manage")
       println(window)
       conn.manageWindow(window)
+      conn.bringToFront(window)
       conn.flush()
       None
     case _ =>
@@ -90,9 +74,9 @@ object XAdapter {
       val event = conn.waitForEvent() match {
         case KeyPressEvent(e) => Some(w.KeyPressEvent((!e).child, (!e).detail, activeMods((!e).state)))
         case KeyReleaseEvent(e) => Some(w.KeyReleaseEvent((!e).child, (!e).detail, activeMods((!e).state)))
-        case ButtonPressEvent(e) => Some(w.ButtonPressEvent((!e).child, (!e).detail, activeMods((!e).state)))
-        case ButtonReleaseEvent(e) => Some(w.ButtonReleaseEvent((!e).child, (!e).detail, activeMods((!e).state)))
-        case MotionNotifyEvent(e) => Some(w.MotionNotifyEvent((!e).child))
+        case ButtonPressEvent(e) => Some(w.ButtonPressEvent((!e).child, (!e).detail, activeMods((!e).state), (!e).event_x, (!e).event_y))
+        case ButtonReleaseEvent(e) => Some(w.ButtonReleaseEvent((!e).child, (!e).detail, activeMods((!e).state), (!e).event_x, (!e).event_y))
+        case MotionNotifyEvent(e) => Some(w.MotionNotifyEvent((!e).child, (!e).event_x, (!e).event_y))
         case MapRequestEvent(e) => Some(w.MapRequestEvent((!e).window))
         case MapNotifyEvent(e) => Some(w.MapNotifyEvent((!e).window))
         case UnmapNotifyEvent(e) => Some(w.UnmapNotifyEvent((!e).window))

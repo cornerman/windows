@@ -53,29 +53,28 @@ object WaylandAdapter {
       println(window)
       wlc_view_close(window)
       None
-    case MouseMoveStart(window) if window != 0 =>
-      println("movestart")
+    case WarpPointer(window, x, y) =>
+      println("wrappointer")
       println(window)
+      val point = stackalloc[wlc_point]
+      !point = new wlc_point(x, y)
+      wlc_pointer_set_position(point)
       None
-    case MouseResizeStart(window) if window != 0 =>
-      println("resizestart")
-      println(window)
-      None
-    case MouseMoving(window) if window != 0 =>
+    case MoveWindow(window, x, y) if window != 0 =>
       println("moving")
       println(window)
+      val geom = wlc_view_get_geometry(window)
+      val g = stackalloc[wlc_geometry]
+      !g = new wlc_geometry(new wlc_point(x, y), (!geom).size)
+      wlc_view_set_geometry(window, WLC_RESIZE_EDGE_NONE, g)
       None
-    case MouseResizing(window) if window != 0 =>
+    case ResizeWindow(window, x, y) if window != 0 =>
       println("resizing")
       println(window)
-      None
-    case MouseMoveEnd(window) if window != 0 =>
-      println("moveend")
-      println(window)
-      None
-    case MouseResizeEnd(window) if window != 0 =>
-      println("resizeend")
-      println(window)
+      val geom = wlc_view_get_geometry(window)
+      val g = stackalloc[wlc_geometry]
+      !g = new wlc_geometry((!geom).origin, new wlc_size(x, y))
+      wlc_view_set_geometry(window, WLC_RESIZE_EDGE_BOTTOM, g)
       None
     case ManageWindow(window) =>
       println("manage")
@@ -99,21 +98,22 @@ object WaylandAdapter {
       println(fromCString(msg))
     })
 
-    wlc_set_output_created_cb((ouput: wlc_handle) => {
+    wlc_set_output_created_cb((output: wlc_handle) => {
       println("output created")
       true
     })
 
-    wlc_set_output_destroyed_cb((ouput: wlc_handle) => {
+    wlc_set_output_destroyed_cb((output: wlc_handle) => {
       println("output destroyed")
     })
 
-    wlc_set_output_focus_cb((ouput: wlc_handle, focus: Boolean) => {
+    wlc_set_output_focus_cb((output: wlc_handle, focus: Boolean) => {
       println("output focus")
     })
 
     wlc_set_view_created_cb((view: wlc_handle) => {
       println("view created")
+      println(view)
       this.handler(MapRequestEvent(view))
       this.handler(MapNotifyEvent(view))
       true
@@ -122,6 +122,7 @@ object WaylandAdapter {
     wlc_set_view_destroyed_cb(
       (view: wlc_handle) => {
         println("view destroyed")
+        println(view)
         this.handler(UnmapNotifyEvent(view))
         // wlc_view_focus(get_topmost(wlc_view_get_output(view), 0));
       })
@@ -129,6 +130,7 @@ object WaylandAdapter {
     wlc_set_view_focus_cb(
       (view: wlc_handle, focus: Boolean) => {
         println("view focus")
+        println(view)
         wlc_view_set_state(view, WLC_BIT_ACTIVATED, focus)
       })
 
@@ -137,35 +139,32 @@ object WaylandAdapter {
         println("view move to output")
       })
 
+    //TODO: pointer, key, motion need to know whether this event was handled, pass on to window?
     wlc_set_keyboard_key_cb(
       (view: wlc_handle, time: Int, modifiers: Ptr[wlc_modifiers], key: Int, state: wlc_key_state) => {
-        println("key")
         val mods = activeMods((!modifiers).mods)
-        println("mods")
         val ev = state match {
           case `WLC_KEY_STATE_PRESSED` => KeyPressEvent(view, key + 8, mods) //why?
           case `WLC_KEY_STATE_RELEASED` => KeyReleaseEvent(view, key + 8, mods)
         }
         this.handler(ev)
-        true
+        false
       })
 
     wlc_set_pointer_button_cb(
       (view: wlc_handle, time: Int, modifiers: Ptr[wlc_modifiers], button: Int, state: wlc_button_state) => {
-        println("button")
         val mods = activeMods((!modifiers).mods)
         val ev = state match {
-          case `WLC_BUTTON_STATE_PRESSED` => ButtonPressEvent(view, button - 271, mods) // why?
-          case `WLC_BUTTON_STATE_RELEASED` => ButtonReleaseEvent(view, button - 271, mods)
+          case `WLC_BUTTON_STATE_PRESSED` => ButtonPressEvent(view, button - 271, mods, 0, 0) // why?
+          case `WLC_BUTTON_STATE_RELEASED` => ButtonReleaseEvent(view, button - 271, mods, 0, 0)
         }
         this.handler(ev)
-        true
+        false
       })
 
     wlc_set_pointer_motion_cb((view: wlc_handle, time: Int, point: Ptr[wlc_point]) => {
-      println("pointer motion")
-      this.handler(MotionNotifyEvent(view))
-      true
+      this.handler(MotionNotifyEvent(view, (!point).x, (!point).y))
+      false
     })
 
     wlc_set_compositor_ready_cb(() => println("ready"))

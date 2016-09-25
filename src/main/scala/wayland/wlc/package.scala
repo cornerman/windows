@@ -42,4 +42,16 @@ package object wlc {
   val WLC_LOG_WARN = 1
   val WLC_LOG_ERROR = 2
   val WLC_LOG_WAYLAND = 3
+
+  //enum wlc_resize_edge {
+  type wlc_resize_edge = Int
+  val WLC_RESIZE_EDGE_NONE = 0
+  val WLC_RESIZE_EDGE_TOP = 1
+  val WLC_RESIZE_EDGE_BOTTOM = 2
+  val WLC_RESIZE_EDGE_LEFT = 4
+  val WLC_RESIZE_EDGE_TOP_LEFT = 5
+  val WLC_RESIZE_EDGE_BOTTOM_LEFT = 6
+  val WLC_RESIZE_EDGE_RIGHT = 8
+  val WLC_RESIZE_EDGE_TOP_RIGHT = 9
+  val WLC_RESIZE_EDGE_BOTTOM_RIGHT = 10
 }

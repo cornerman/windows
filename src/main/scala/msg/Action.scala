@@ -11,12 +11,9 @@ sealed trait InterpreterAction extends Action
 case class Command(cmd: String) extends ConnectionAction
 case class Exit(reason: String) extends ConnectionAction
 case class Close(window: Long) extends ConnectionAction
-case class MouseResizeStart(window: Long) extends ConnectionAction
-case class MouseMoveStart(window: Long) extends ConnectionAction
-case class MouseResizing(window: Long) extends ConnectionAction
-case class MouseMoving(window: Long) extends ConnectionAction
-case class MouseResizeEnd(window: Long) extends ConnectionAction
-case class MouseMoveEnd(window: Long) extends ConnectionAction
+case class WarpPointer(window: Long, x: Int, y: Int) extends ConnectionAction
+case class ResizeWindow(window: Long, x: Int, y: Int) extends ConnectionAction
+case class MoveWindow(window: Long, x: Int, y: Int) extends ConnectionAction
 case class Configure(config: Config) extends ConnectionAction
 case class ManageWindow(window: Long) extends ConnectionAction
 

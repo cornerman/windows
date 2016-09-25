@@ -12,6 +12,14 @@ import scala.scalanative.native._, Unsigned._
     val x: CInt,
     val y: CInt)
 
+  @struct class wlc_size(
+    val w: CUInt,
+    val h: CUInt)
+
+  @struct class wlc_geometry(
+    val origin: wlc_point,
+    val size: wlc_size)
+
   type wlc_handle = CULong // TODO: uintptr_t
 
   def wlc_init(): Boolean = extern
@@ -128,4 +136,18 @@ import scala.scalanative.native._, Unsigned._
   /** Get current visibility bitmask. */
   def wlc_output_get_mask(output: wlc_handle): CUInt = extern
 
+  /** Get current pointer position. */
+  def wlc_pointer_get_position(out_position: Ptr[wlc_point]): Unit = extern
+
+  /** Set current pointer position. */
+  def wlc_pointer_set_position(position: Ptr[wlc_point]): Unit = extern
+
+  /** Get current geometry. (what client sees) */
+  def wlc_view_get_geometry(view: wlc_handle): Ptr[wlc_geometry] = extern
+
+  /** Get visible geometry. (what wlc displays) */
+  def wlc_view_get_visible_geometry(view: wlc_handle, out_geometry: Ptr[wlc_geometry]): Unit = extern
+
+  /** Set geometry. Set edges if the geometry change is caused by interactive resize. */
+  def wlc_view_set_geometry(view: wlc_handle, edges: wlc_resize_edge, geometry: Ptr[wlc_geometry]): Unit = extern
 }
