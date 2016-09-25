@@ -10,9 +10,17 @@ import Modifier._
 object WaylandAdapter {
 
   var handler: Event => Unit = _
-  var config: Config = _
 
-  def translateMod(mod: ModType): wlc_modifier_bit = mod match {
+  def activeMods(modByte: wlc_modifier_bit): Set[Modifier] = {
+    Modifier.values.filterNot(_ == Lock).flatMap { mod =>
+      (translateMod(mod) & modByte) match {
+        case 0 => None
+        case _ => Some(mod)
+      }
+    }.toSet
+  }
+
+  def translateMod(mod: Modifier): wlc_modifier_bit = mod match {
     case Shift => WLC_BIT_MOD_SHIFT
     case Lock => ???
     case Ctrl => WLC_BIT_MOD_CTRL
@@ -24,9 +32,8 @@ object WaylandAdapter {
   }
 
   def act(action: ConnectionAction): Option[String] = action match {
-    case Configure(config) => import config._
+    case Configure(config) =>
       println("configure")
-      this.config = config
       None
     case Exit(reason) =>
       println("exit")
@@ -71,6 +78,9 @@ object WaylandAdapter {
     case ManageWindow(window) =>
       println("manage")
       println(window)
+      wlc_view_set_mask(window, wlc_output_get_mask(wlc_view_get_output(window)))
+      wlc_view_bring_to_front(window)
+      wlc_view_focus(window)
       None
     case _ =>
       println("ignored action")
@@ -100,15 +110,15 @@ object WaylandAdapter {
 
     wlc_set_view_created_cb((view: wlc_handle) => {
       println("view created")
-      wlc_view_set_mask(view, wlc_output_get_mask(wlc_view_get_output(view)))
-      wlc_view_bring_to_front(view)
-      wlc_view_focus(view)
+      this.handler(MapRequestEvent(view))
+      this.handler(MapNotifyEvent(view))
       true
     })
 
     wlc_set_view_destroyed_cb(
       (view: wlc_handle) => {
         println("view destroyed")
+        this.handler(UnmapNotifyEvent(view))
         // wlc_view_focus(get_topmost(wlc_view_get_output(view), 0));
       })
 
@@ -124,34 +134,27 @@ object WaylandAdapter {
       })
 
     wlc_set_keyboard_key_cb(
-      (view: wlc_handle, time: Int, mods: Ptr[wlc_modifiers], key: Int, state: wlc_key_state) => {
+      (view: wlc_handle, time: Int, modifiers: Ptr[wlc_modifiers], key: Int, state: wlc_key_state) => {
         println("key")
-        val modifier = translateMod(this.config.mod)
-        println(((!mods).mods & modifier))
-        println(key)
-        if (((!mods).mods & modifier) != 0) {
-          val ev = state match {
-            case `WLC_KEY_STATE_PRESSED` => KeyPressEvent(view, key + 8) //why?
-            case `WLC_KEY_STATE_RELEASED` => KeyReleaseEvent(view, key + 8)
-          }
-          this.handler(ev)
+        val mods = activeMods((!modifiers).mods)
+        println("mods")
+        val ev = state match {
+          case `WLC_KEY_STATE_PRESSED` => KeyPressEvent(view, key + 8, mods) //why?
+          case `WLC_KEY_STATE_RELEASED` => KeyReleaseEvent(view, key + 8, mods)
         }
+        this.handler(ev)
         true
       })
 
     wlc_set_pointer_button_cb(
-      (view: wlc_handle, time: Int, mods: Ptr[wlc_modifiers], button: Int, state: wlc_button_state) => {
+      (view: wlc_handle, time: Int, modifiers: Ptr[wlc_modifiers], button: Int, state: wlc_button_state) => {
         println("button")
-        val modifier = translateMod(this.config.mod)
-        println(((!mods).mods & modifier))
-        println(button)
-        if (((!mods).mods & modifier) != 0) {
-          val ev = state match {
-            case `WLC_BUTTON_STATE_PRESSED` => ButtonPressEvent(view, button - 271) // why?
-            case `WLC_BUTTON_STATE_RELEASED` => ButtonReleaseEvent(view, button - 271)
-          }
-          this.handler(ev)
+        val mods = activeMods((!modifiers).mods)
+        val ev = state match {
+          case `WLC_BUTTON_STATE_PRESSED` => ButtonPressEvent(view, button - 271, mods) // why?
+          case `WLC_BUTTON_STATE_RELEASED` => ButtonReleaseEvent(view, button - 271, mods)
         }
+        this.handler(ev)
         true
       })
 
@@ -160,7 +163,7 @@ object WaylandAdapter {
       true
     })
 
-    // wlc_set_compositor_ready_cb(() => println("ready"))
+    wlc_set_compositor_ready_cb(() => println("ready"))
 
     wlc_init() match {
       case false => Some("error initializing wlc")

@@ -93,7 +93,7 @@ import scala.scalanative.native._, Unsigned._
   // void wlc_set_touch_cb(bool (*cb)(wlc_handle view, uint32_t time, const struct wlc_modifiers*, enum wlc_touch_type, int32_t slot, const struct wlc_point*));
 
   /** Compositor is ready to accept clients. */
-  def wlc_set_compositor_ready_cb(cb: () => Unit): Unit = extern
+  def wlc_set_compositor_ready_cb(cb: FunctionPtr0[Unit]): Unit = extern
 
   /** Compositor is about to terminate */
   def wlc_set_compositor_terminate_cb(cb: FunctionPtr0[Unit]): Unit = extern

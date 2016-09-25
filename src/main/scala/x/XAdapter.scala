@@ -4,22 +4,7 @@ import windows.msg._
 import windows.system.Commands
 
 object XAdapter {
-
-  import Modifier._
-  import xcb._
-  def translateMod(mod: ModType): xcb_mod_mask_t  = mod match {
-    case Shift => XCB_MOD_MASK_SHIFT
-    case Lock => XCB_MOD_MASK_LOCK
-    case Ctrl => XCB_MOD_MASK_CONTROL
-    case Mod1 => XCB_MOD_MASK_1
-    case Mod2 => XCB_MOD_MASK_2
-    case Mod3 => XCB_MOD_MASK_3
-    case Mod4 => XCB_MOD_MASK_4
-    case Mod5 => XCB_MOD_MASK_5
-  }
-
-  //TODO
-  implicit def longToUInt(value: Long): Int = value.toInt;
+  import XHelper._
 
   def act(conn: X)(action: ConnectionAction): Option[String] = action match {
     case Configure(config) => import config._
@@ -103,10 +88,10 @@ object XAdapter {
       //TODO: here a partial function throws exception in native?
       import windows.{msg => w}
       val event = conn.waitForEvent() match {
-        case KeyPressEvent(e) => Some(w.KeyPressEvent((!e).child, (!e).detail))
-        case KeyReleaseEvent(e) => Some(w.KeyReleaseEvent((!e).child, (!e).detail))
-        case ButtonPressEvent(e) => Some(w.ButtonPressEvent((!e).child, (!e).detail))
-        case ButtonReleaseEvent(e) => Some(w.ButtonReleaseEvent((!e).child, (!e).detail))
+        case KeyPressEvent(e) => Some(w.KeyPressEvent((!e).child, (!e).detail, activeMods((!e).state)))
+        case KeyReleaseEvent(e) => Some(w.KeyReleaseEvent((!e).child, (!e).detail, activeMods((!e).state)))
+        case ButtonPressEvent(e) => Some(w.ButtonPressEvent((!e).child, (!e).detail, activeMods((!e).state)))
+        case ButtonReleaseEvent(e) => Some(w.ButtonReleaseEvent((!e).child, (!e).detail, activeMods((!e).state)))
         case MotionNotifyEvent(e) => Some(w.MotionNotifyEvent((!e).child))
         case MapRequestEvent(e) => Some(w.MapRequestEvent((!e).window))
         case MapNotifyEvent(e) => Some(w.MapNotifyEvent((!e).window))

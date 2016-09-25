@@ -4,6 +4,33 @@ import scala.scalanative.native._, stdlib._, stdio._
 import Unsigned._
 import xcb._, XCB._
 
+object XHelper {
+  import windows.msg.Modifier, Modifier._
+
+  def activeMods(modByte: Short): Set[Modifier] = {
+    Modifier.values.flatMap { mod =>
+      (translateMod(mod) & modByte) match {
+        case 0 => None
+        case _ => Some(mod)
+      }
+    }.toSet
+  }
+
+  def translateMod(mod: Modifier): xcb_mod_mask_t  = mod match {
+    case Shift => XCB_MOD_MASK_SHIFT
+    case Lock => XCB_MOD_MASK_LOCK
+    case Ctrl => XCB_MOD_MASK_CONTROL
+    case Mod1 => XCB_MOD_MASK_1
+    case Mod2 => XCB_MOD_MASK_2
+    case Mod3 => XCB_MOD_MASK_3
+    case Mod4 => XCB_MOD_MASK_4
+    case Mod5 => XCB_MOD_MASK_5
+  }
+
+  //TODO
+  implicit def longToUInt(value: Long): xcb_window_t = value.toInt;
+}
+
 class X(conn: Ptr[xcb_connection_t]) {
   private val screen = xcb_setup_roots_iterator(xcb_get_setup(conn))
   private val root = (!screen).root
