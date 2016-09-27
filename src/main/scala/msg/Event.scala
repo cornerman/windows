@@ -1,17 +1,16 @@
 package windows.msg
 
-//TODO enum
-object Modifier {
-  type Modifier = Int
-  val Shift = 1
-  val Lock = 2
-  val Ctrl = 3
-  val Mod1 = 4
-  val Mod2 = 5
-  val Mod3 = 6
-  val Mod4 = 7
-  val Mod5 = 8
+sealed trait Modifier
+case object Shift extends Modifier
+case object Lock extends Modifier
+case object Ctrl extends Modifier
+case object Mod1 extends Modifier
+case object Mod2 extends Modifier
+case object Mod3 extends Modifier
+case object Mod4 extends Modifier
+case object Mod5 extends Modifier
 
+object Modifier {
   // TODOset with multiple entries throws exception?
   def values = Array(Shift, Lock, Ctrl, Mod1, Mod2, Mod3, Mod4, Mod5)
 }

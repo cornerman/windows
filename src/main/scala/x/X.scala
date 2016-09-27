@@ -5,7 +5,7 @@ import Unsigned._
 import xcb._, XCB._
 
 object XHelper {
-  import windows.msg.Modifier, Modifier._
+  import windows.msg._
 
   def activeMods(modByte: Short): Set[Modifier] = {
     Modifier.values.flatMap { mod =>

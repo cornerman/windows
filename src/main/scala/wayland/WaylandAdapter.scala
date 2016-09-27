@@ -7,8 +7,6 @@ import windows.system.Commands
 import wlc._, WLC._
 
 object WLCHelper {
-  import windows.msg.Modifier, Modifier._
-
   def activeMods(modByte: wlc_modifier_bit): Set[Modifier] = {
     Modifier.values.filterNot(_ == Lock).flatMap { mod =>
       (translateMod(mod) & modByte) match {
