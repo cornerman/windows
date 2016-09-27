@@ -1,7 +1,7 @@
 enablePlugins(ScalaNativePlugin)
 
 name := "windows"
-organization := "org.windows"
-version := "0.0.1"
+organization := "com.github.cornerman"
+version := "0.1.0-SNAPSHOT"
 
 scalaVersion := "2.11.8"
