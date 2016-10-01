@@ -21,27 +21,21 @@ case class MappedWindow(window: Long) extends InterpreterAction
 case class UnmappedWindow(window: Long) extends InterpreterAction
 
 object ActionDispatch {
-  def chain(handlers: ((State, Action) => State)*)(initialState: State, action: Action): State = {
-    var state = initialState
-    for (handler <- handlers)
-      state = handler(state, action)
-
-    state
+  def chain(handlers: ((State, Action) => State)*)(state: State, action: Action): State = {
+    val stateHandlers = handlers.map(handler => (s: State) => handler(s, action))
+    val chainedHandler = stateHandlers.fold((s: State) => s)((h1, h2) => s => h2(h1(s)))
+    chainedHandler(state)
   }
 
-  def onAction(handler: PartialFunction[Action, Option[String]])(s: State, action: Action): State = {
-    handler.lift(action).flatten.map(s.error).getOrElse(s)
-  }
-
-  def onStateAction(handler: PartialFunction[(State, Action), State])(s: State, action: Action): State = {
-    handler.lift(s, action).getOrElse(s)
+  def onAction(handler: PartialFunction[(State, Action), State])(state: State, action: Action): State = {
+    handler.lift(state, action).getOrElse(state)
   }
 
   def onInterpreter(handler: (State, InterpreterAction) => State) = {
-    onStateAction { case (s, a: InterpreterAction)  => handler(s, a) } _
+    onAction { case (s, a: InterpreterAction)  => handler(s, a) } _
   }
 
   def onConnection(handler: ConnectionAction => Option[String]) = {
-    onAction { case a: ConnectionAction => handler(a) } _
+    onAction { case (s, a: ConnectionAction) => handler(a).map(s.error).getOrElse(s) } _
   }
 }

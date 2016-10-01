@@ -1,18 +1,17 @@
 package windows.msg
 
-//TODO seq of keys/buttons
-case class Mode(key: Option[KeyPressEvent], button: Option[ButtonPressEvent]) {
+case class Mode(keys: Seq[KeyPressEvent], buttons: Seq[ButtonPressEvent]) {
   def update(event: Event) = event match {
-    case e: KeyPressEvent => copy(key = Some(e))
-    case e: KeyReleaseEvent => copy(key = None)
-    case e: ButtonPressEvent => copy(button = Some(e))
-    case e: ButtonReleaseEvent => copy(button = None)
+    case e: KeyPressEvent => copy(keys = keys :+ e)
+    case KeyReleaseEvent(_, key, _) => copy(keys = keys.filterNot(_.key == key))
+    case e: ButtonPressEvent => copy(buttons = buttons :+ e)
+    case ButtonReleaseEvent(_, button, _, _) => copy(buttons = buttons.filterNot(_.button == button))
     case _ => this
   }
 }
 
 object Mode {
-  def initial = Mode(None, None)
+  def initial = Mode(Seq.empty, Seq.empty)
 }
 
 case class State(config: Config, windows: Seq[Long], errors: Seq[String]) {

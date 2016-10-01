@@ -6,7 +6,9 @@ import xcb._, XCB._
 object Event {
   type EventPtr = Ptr[xcb_generic_event_t]
 
-  def as[T](e: EventPtr, response: Int): Option[Ptr[T]] = if (response == ((!e).response_type & ~0x80)) Some(e.cast[Ptr[T]]) else None
+  def as[T](e: EventPtr, response: Int): Option[Ptr[T]] = {
+    if (response == ((!e).response_type & ~0x80)) Some(e.cast[Ptr[T]]) else None
+  }
 }
 import Event._
 

@@ -8,7 +8,7 @@ object XHelper {
   import windows.msg._
 
   def activeMods(modByte: Short): Set[Modifier] = {
-    Modifier.values.flatMap { mod =>
+    Array(Shift, Lock, Ctrl, Mod1, Mod2, Mod3, Mod4, Mod5).flatMap { mod =>
       (translateMod(mod) & modByte) match {
         case 0 => None
         case _ => Some(mod)
