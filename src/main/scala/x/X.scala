@@ -3,6 +3,7 @@ package windows.x
 import scala.scalanative.native._, stdlib._, stdio._
 import Unsigned._
 import xcb._, XCB._
+import windows.msg.Point
 
 object XHelper {
   import windows.msg._
@@ -55,6 +56,10 @@ class X(conn: Ptr[xcb_connection_t]) {
     free(values)
   }
 
+  def grabKeyboard() {
+    xcb_grab_keyboard_unchecked(conn, 0, root, XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC)
+  }
+
   def grabKey(keycode: xcb_keycode_t, modMask: xcb_mod_mask_t) {
     xcb_grab_key(conn, 0, root, modMask, keycode, XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC)
   }
@@ -67,8 +72,8 @@ class X(conn: Ptr[xcb_connection_t]) {
     xcb_map_window(conn, win)
   }
 
-  def warpPointer(win: xcb_window_t, x: Int, y: Int) {
-    xcb_warp_pointer(conn, XCB_NONE, win, 0, 0, 0, 0, x.toShort, y.toShort)
+  def warpPointer(win: xcb_window_t, point: Point) {
+    xcb_warp_pointer(conn, XCB_NONE, win, 0, 0, 0, 0, point.x.toShort, point.y.toShort)
   }
 
   // def warpPointerForMove(win: xcb_window_t) {
@@ -83,20 +88,20 @@ class X(conn: Ptr[xcb_connection_t]) {
   }
 
   def grabPointer() {
-    xcb_grab_pointer(conn, 0, root, (XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_BUTTON_MOTION | XCB_EVENT_MASK_POINTER_MOTION_HINT).toShort, XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC, root, XCB_NONE, XCB_CURRENT_TIME)
+    xcb_grab_pointer(conn, 0, root, (XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_BUTTON_MOTION | XCB_EVENT_MASK_POINTER_MOTION_HINT).toShort, XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC, root, XCB_NONE, XCB_CURRENT_TIME)
   }
 
-  def moveWindow(win: xcb_window_t, x: Int, y: Int) {
+  def moveWindow(win: xcb_window_t, point: Point) {
     val values = createValues(2)
-    values(0) = x
-    values(1) = y
+    values(0) = point.x
+    values(1) = point.y
     xcb_configure_window(conn, win, (XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y).toShort, values)
     free(values)
   }
 
 //   def moveToPointer(win: xcb_window_t) {
-//     val pointerRequest = xcb_query_pointer(conn, root)
-//     val geomRequest = xcb_get_geometry(conn, win)
+//     val pointerRequest = xcb_query_pointer_unchecked(conn, root)
+//     val geomRequest = xcb_get_geometry_unchecked(conn, win)
 //     val pointer = xcb_query_pointer_reply(conn, pointerRequest, null)
 //     val geom = xcb_get_geometry_reply(conn, geomRequest, null)
 //     val values = createValues(2)
@@ -106,17 +111,17 @@ class X(conn: Ptr[xcb_connection_t]) {
 //     free(values)
 //   }
 
-  def resizeWindow(win: xcb_window_t, x: Int, y: Int) {
+  def resizeWindow(win: xcb_window_t, point: Point) {
     val values = createValues(2)
-    values(0) = x
-    values(1) = y
+    values(0) = point.x
+    values(1) = point.y
     xcb_configure_window(conn, win, (XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT).toShort, values)
     free(values)
   }
 
   // def resizeToPointer(win: xcb_window_t) {
-  //   val pointerRequest = xcb_query_pointer(conn, root)
-  //   val geomRequest = xcb_get_geometry(conn, win)
+  //   val pointerRequest = xcb_query_pointer_unchecked(conn, root)
+  //   val geomRequest = xcb_get_geometry_unchecked(conn, win)
   //   val pointer = xcb_query_pointer_reply(conn, pointerRequest, null)
   //   val geom = xcb_get_geometry_reply(conn, geomRequest, null)
   //   val values = createValues(2)

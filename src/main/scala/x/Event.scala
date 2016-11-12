@@ -12,6 +12,10 @@ object Event {
 }
 import Event._
 
+object ErrorEvent {
+  def unapply(e: EventPtr) = as[xcb_generic_error_t](e, 0)
+}
+
 object ButtonPressEvent {
   def unapply(e: EventPtr) = as[xcb_button_press_event_t](e, XCB_BUTTON_PRESS)
 }

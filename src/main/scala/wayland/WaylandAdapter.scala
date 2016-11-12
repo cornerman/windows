@@ -31,101 +31,102 @@ object WaylandAdapter {
   import windows.system.Commands
   import WLCHelper._
 
-  def act(action: ConnectionAction): Option[String] = action match {
-    case Configure(config) => None
+  def act(action: ConnectionAction): Unit = action match {
     case Exit(reason) =>
       wlc_terminate()
-      None
     case Command(cmd) =>
       // wlc_exec(toCString(cmd), Array(toCString(cmd), null))
       Commands.execute(cmd)
-      None
     case Close(window) =>
       wlc_view_close(window)
-      None
-    case WarpPointer(window, x, y) =>
-      val point = stackalloc[wlc_point]
-      !point = new wlc_point(x, y)
-      wlc_pointer_set_position(point)
-      None
-    case MoveWindow(window, x, y) if window != 0 =>
+    case WarpPointer(window, point) =>
+      val p = stackalloc[wlc_point]
+      !p = new wlc_point(point.x, point.y)
+      wlc_pointer_set_position(p)
+    case MoveWindow(window, point) if window != 0 =>
       wlc_view_bring_to_front(window)
       val geom = wlc_view_get_geometry(window)
       val g = stackalloc[wlc_geometry]
-      !g = new wlc_geometry(new wlc_point(x, y), (!geom).size)
+      !g = new wlc_geometry(new wlc_point(point.x, point.y), (!geom).size)
       wlc_view_set_geometry(window, WLC_RESIZE_EDGE_NONE, g)
-      None
-    case ResizeWindow(window, x, y) if window != 0 =>
+    case ResizeWindow(window, point: Point) if window != 0 =>
       wlc_view_bring_to_front(window)
       val geom = wlc_view_get_geometry(window)
       val g = stackalloc[wlc_geometry]
-      !g = new wlc_geometry((!geom).origin, new wlc_size(x, y))
+      !g = new wlc_geometry((!geom).origin, new wlc_size(point.x, point.y))
       wlc_view_set_geometry(window, WLC_RESIZE_EDGE_BOTTOM, g)
-      None
     case ManageWindow(window) =>
       wlc_view_set_mask(window, wlc_output_get_mask(wlc_view_get_output(window)))
       wlc_view_bring_to_front(window)
       wlc_view_focus(window)
-      None
-    case _ => None
+    case _ =>
   }
 
   var handler: Event => Boolean = _
-  def run(handler: Event => Boolean): Option[String] = {
+  def run(eventHandler: Event => EventResult): Option[String] = {
     //TODO closure broken
-    this.handler = handler
+    this.handler = ev => {
+      val res = eventHandler(ev)
+      res.actions.foreach(act)
+      res.handled
+    }
 
     //TODO: why need to inline?
     wlc_log_set_handler(
       (logType: wlc_log_type, msg: CString) => {
-        println(fromCString(msg))
+        // handler(LogEvent(Log.Info(fromCString(msg)))) //TODO logtype
+        ()
       }
     )
 
     wlc_set_output_created_cb(
       (output: wlc_handle) => {
-        println("output created")
+        // handler(LogEvent(Log.Info("output created")))
         true
       }
     )
 
     wlc_set_output_destroyed_cb(
       (output: wlc_handle) => {
-        println("output destroyed")
+        // handler(LogEvent(Log.Info("output destroyed")))
+        ()
       }
     )
 
     wlc_set_output_focus_cb(
       (output: wlc_handle, focus: Boolean) => {
-        println("output focus")
+        // handler(LogEvent(Log.Info("output focus")))
+        ()
       }
     )
 
     wlc_set_view_created_cb(
       (view: wlc_handle) => {
-        val handled = this.handler(MapRequestEvent(view))
-        if (handled) this.handler(MapNotifyEvent(view))
+        val handled = handler(MapRequestEvent(view))
+        if (handled) handler(MapNotifyEvent(view))
         else false
       }
     )
 
     wlc_set_view_destroyed_cb(
       (view: wlc_handle) => {
-        this.handler(UnmapNotifyEvent(view))
+        handler(UnmapNotifyEvent(view))
         ()
       }
     )
 
     wlc_set_view_focus_cb(
       (view: wlc_handle, focus: Boolean) => {
-        println(s"view '$view' is focused: $focus")
+        // val log = Log.Info()
+        // handler(LogEvent(Log.Info("output focus")))
         wlc_view_set_state(view, WLC_BIT_ACTIVATED, focus)
       }
     )
 
     wlc_set_view_move_to_output_cb(
       (view: wlc_handle, from_output: wlc_handle, to_output: wlc_handle) => {
-        println("view move to output")
+        // handler(LogEvent(Log.Info("view move to output")))
+        ()
       }
     )
 
@@ -136,7 +137,7 @@ object WaylandAdapter {
           case `WLC_KEY_STATE_PRESSED`  => KeyPressEvent(view, key + 8, mods) //why?
           case `WLC_KEY_STATE_RELEASED` => KeyReleaseEvent(view, key + 8, mods)
         }
-        this.handler(ev)
+        handler(ev)
       }
     )
 
@@ -150,13 +151,13 @@ object WaylandAdapter {
           case `WLC_BUTTON_STATE_PRESSED`  => ButtonPressEvent(view, button - 271, mods, point) // why?
           case `WLC_BUTTON_STATE_RELEASED` => ButtonReleaseEvent(view, button - 271, mods, point)
         }
-        this.handler(ev)
+        handler(ev)
       }
     )
 
     wlc_set_pointer_motion_cb(
       (view: wlc_handle, time: Int, point: Ptr[wlc_point]) => {
-        this.handler(MotionNotifyEvent(view, Point((!point).x, (!point).y)))
+        handler(MotionNotifyEvent(view, Point((!point).x, (!point).y)))
       }
     )
 

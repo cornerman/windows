@@ -187,6 +187,7 @@ import scala.scalanative.native._, Unsigned._
   @struct class xcb_get_geometry_cookie_t(val sequence: CUInt)
   @struct class xcb_grab_pointer_cookie_t(val sequence: CUInt)
   @struct class xcb_query_pointer_cookie_t(val sequence: CUInt)
+  @struct class xcb_grab_keyboard_cookie_t(val sequence: CUInt)
 
   @struct class xcb_get_geometry_reply_t(
     val response_type: CUChar,
@@ -226,6 +227,12 @@ import scala.scalanative.native._, Unsigned._
     val pad: Array[CUInt], // length 5
     val full_sequence: CUInt)
 
+  @struct class xcb_grab_keyboard_reply_t(
+    val response_type: CUChar,
+    val status: CUChar,
+    val sequence: CUShort,
+    val length: CUInt)
+
 
   def xcb_connect(displayname: CString, screenp: Ptr[Int]): Ptr[xcb_connection_t] = extern
   def xcb_connection_has_error(c: Ptr[xcb_connection_t]): CInt = extern
@@ -234,8 +241,11 @@ import scala.scalanative.native._, Unsigned._
   def xcb_flush(c: Ptr[xcb_connection_t]): CInt = extern
   def xcb_disconnect(c: Ptr[xcb_connection_t]): Unit = extern
 
-  def xcb_grab_key(c: Ptr[xcb_connection_t], owner_events: CUChar, grab_window: xcb_window_t, modifiers: CUShort, key: xcb_keycode_t, pointer_mode: CUChar, keyboard_mode: CUChar): xcb_void_cookie_t = extern //TODO xcb_request_check with xcb_grab_key_checked
-  def xcb_grab_button(c: Ptr[xcb_connection_t], owner_events: CUChar, grab_window: xcb_window_t, event_mask: CUShort, pointer_mode: CUChar, keyboard_mode: CUChar, confine_to: xcb_window_t, cursor: xcb_cursor_t, button: xcb_button_t, modifiers: CUShort): xcb_void_cookie_t = extern //TODO xcb_request_check with xcb_grab_button_checked
+  def xcb_grab_key(c: Ptr[xcb_connection_t], owner_events: CUChar, grab_window: xcb_window_t, modifiers: CUShort, key: xcb_keycode_t, pointer_mode: CUChar, keyboard_mode: CUChar): xcb_void_cookie_t = extern
+  def xcb_grab_button(c: Ptr[xcb_connection_t], owner_events: CUChar, grab_window: xcb_window_t, event_mask: CUShort, pointer_mode: CUChar, keyboard_mode: CUChar, confine_to: xcb_window_t, cursor: xcb_cursor_t, button: xcb_button_t, modifiers: CUShort): xcb_void_cookie_t = extern
+  def xcb_grab_keyboard(conn: Ptr[xcb_connection_t], owner_events: CUChar, grab_window: xcb_window_t, time: xcb_timestamp_t, pointer_mode: CUChar, keyboard_mode: CUChar): xcb_grab_keyboard_cookie_t = extern
+  def xcb_grab_keyboard_unchecked(conn: Ptr[xcb_connection_t], owner_events: CUChar, grab_window: xcb_window_t, time: xcb_timestamp_t, pointer_mode: CUChar, keyboard_mode: CUChar): xcb_grab_keyboard_cookie_t = extern
+  def xcb_grab_keyboard_reply(conn: Ptr[xcb_connection_t], cookie: xcb_grab_keyboard_cookie_t, e: Ptr[Ptr[xcb_generic_error_t]]): Ptr[xcb_grab_keyboard_reply_t] = extern
 
   def xcb_wait_for_event(c: Ptr[xcb_connection_t]): Ptr[xcb_generic_event_t] = extern
   def xcb_poll_for_event(c: Ptr[xcb_connection_t]): Ptr[xcb_generic_event_t] = extern
@@ -246,13 +256,16 @@ import scala.scalanative.native._, Unsigned._
   def xcb_destroy_window(conn: Ptr[xcb_connection_t], window: xcb_window_t): xcb_void_cookie_t = extern
 
   def xcb_get_geometry(conn: Ptr[xcb_connection_t], drawable: xcb_drawable_t): xcb_get_geometry_cookie_t = extern
+  def xcb_get_geometry_unchecked(conn: Ptr[xcb_connection_t], drawable: xcb_drawable_t): xcb_get_geometry_cookie_t = extern
   def xcb_get_geometry_reply(conn: Ptr[xcb_connection_t], cookie: xcb_get_geometry_cookie_t, e: Ptr[Ptr[xcb_generic_error_t]]): Ptr[xcb_get_geometry_reply_t] = extern
 
   def xcb_warp_pointer(conn: Ptr[xcb_connection_t], src_window: xcb_window_t, dst_window: xcb_window_t, src_x: CShort, src_y: CShort, src_width: CUShort, src_height: CUShort, dst_x: CShort, dst_y: CShort): xcb_void_cookie_t = extern
   def xcb_grab_pointer(conn: Ptr[xcb_connection_t], owner_events: CUChar, grab_window: xcb_window_t, event_mask: CUShort, pointer_mode: CUChar, keyboard_mode: CUChar, confine_to: xcb_window_t, cursor: xcb_cursor_t, time: xcb_timestamp_t): xcb_grab_pointer_cookie_t = extern
   def xcb_ungrab_pointer(conn: Ptr[xcb_connection_t], time: xcb_timestamp_t): xcb_void_cookie_t = extern
   def xcb_query_pointer(conn: Ptr[xcb_connection_t], window: xcb_window_t): xcb_query_pointer_cookie_t = extern
+  def xcb_query_pointer_unchecked(conn: Ptr[xcb_connection_t], window: xcb_window_t): xcb_query_pointer_cookie_t = extern
   def xcb_query_pointer_reply(conn: Ptr[xcb_connection_t], cookie: xcb_query_pointer_cookie_t, e: Ptr[Ptr[xcb_generic_error_t]]): Ptr[xcb_query_pointer_reply_t] = extern
 
+  def xcb_request_check(conn: Ptr[xcb_connection_t], cookie: xcb_void_cookie_t): Ptr[xcb_generic_error_t] = extern
 }
 

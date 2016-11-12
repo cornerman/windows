@@ -1,37 +1,32 @@
 package windows
 
+import scala.scalanative.native._, stdio._
 import windows.msg._
 
 object WM {
-  def run(config: Config,
-          runner: (Event => Boolean) => Option[String],
-          reactor: (Config, Mode, Event) => Seq[Action],
-          dispatcher: (State, Action) => State): Option[String] = {
+  type Runner = (Event => EventResult) => Option[String]
+  type Dispatcher = (State, Event) => (State, EventResult)
 
-    var mode = Mode.initial
+  def run(config: Config, runner: Runner, dispatcher: Dispatcher = defaultDispatcher) {
+    setvbuf(stdout, null, _IOLBF, 0) // line buffered
+
     var state = State.initial(config)
 
-    dispatcher(state, Configure(config))
     runner { event =>
-      println(event)
-      val actions = reactor(state.config, mode, event)
-      actions foreach { action =>
-        println(action)
-        state = dispatcher(state, action)
-        if (state.errors.nonEmpty) {
-          val msg = state.errors.mkString(",")
-          dispatcher(state, Exit(msg))
-        }
-      }
-
-      mode = mode.update(event)
-      actions.nonEmpty
-    }
+      println(state); println(event)
+      val (newState, result) = dispatcher(state, event)
+      println(newState); println(result)
+      state = newState
+      result
+    } foreach println
   }
 
-  def run(config: Config, runner: (Event => Boolean) => Option[String], act: ConnectionAction => Option[String]): Option[String] = {
-    import ActionDispatch._
-    val dispatcher = chain(onConnection(act), onInterpreter(Tiling.interpret)) _
-    run(config, runner, Reactor.react _, dispatcher)
+  def defaultDispatcher(state: State, event: Event): (State, EventResult) = Reactor.react(state, event) match {
+    case Some(action) =>
+      val newState = Interpreter.interpret(state, action)
+      val actions = Layouter.layout(newState, action)
+      val connActions = actions collect { case a: ConnectionAction => a }
+      (newState, EventResult(true,  connActions))
+    case None => (state, EventResult(false, Seq.empty))
   }
 }

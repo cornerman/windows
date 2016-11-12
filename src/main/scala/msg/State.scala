@@ -1,22 +1,12 @@
 package windows.msg
 
-case class Mode(keys: Seq[KeyPressEvent], buttons: Seq[ButtonPressEvent]) {
-  def update(event: Event) = event match {
-    case e: KeyPressEvent => copy(keys = keys :+ e)
-    case KeyReleaseEvent(_, key, _) => copy(keys = keys.filterNot(_.key == key))
-    case e: ButtonPressEvent => copy(buttons = buttons :+ e)
-    case ButtonReleaseEvent(_, button, _, _) => copy(buttons = buttons.filterNot(_.button == button))
-    case _ => this
-  }
-}
-
+sealed trait Mode
 object Mode {
-  def initial = Mode(Seq.empty, Seq.empty)
+  case object Resize extends Mode
+  case object Move extends Mode
 }
 
-case class State(config: Config, windows: Seq[Long], errors: Seq[String]) {
-  def error(msg: String) = copy(errors = errors :+ msg)
-}
+case class State(config: Config, mode: Option[Mode], windows: Seq[Long])
 object State {
-  def initial(config: Config) = State(config, Seq.empty, Seq.empty)
+  def initial(config: Config) = State(config, None, Seq.empty)
 }
