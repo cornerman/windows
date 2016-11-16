@@ -31,12 +31,15 @@ object WaylandAdapter {
   import windows.system.Commands
   import WLCHelper._
 
-  def act(action: ConnectionAction): Unit = action match {
+  def act(action: Action): Unit = action match {
     case Exit(reason) =>
       wlc_terminate()
     case Command(cmd) =>
       // wlc_exec(toCString(cmd), Array(toCString(cmd), null))
       Commands.execute(cmd)
+    case Focus(window) =>
+      wlc_view_bring_to_front(window)
+      wlc_view_focus(window)
     case Close(window) =>
       wlc_view_close(window)
     case WarpPointer(window, point) =>
@@ -117,9 +120,8 @@ object WaylandAdapter {
 
     wlc_set_view_focus_cb(
       (view: wlc_handle, focus: Boolean) => {
-        // val log = Log.Info()
-        // handler(LogEvent(Log.Info("output focus")))
-        wlc_view_set_state(view, WLC_BIT_ACTIVATED, focus)
+        val handled = handler(FocusEvent(view, focus))
+        wlc_view_set_state(view, WLC_BIT_ACTIVATED, handled)
       }
     )
 

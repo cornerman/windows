@@ -9,7 +9,7 @@ object XAdapter {
 
   private var shouldExit = false
 
-  def act(conn: X)(action: ConnectionAction): Unit = action match {
+  def act(conn: X)(action: Action): Unit = action match {
     case Configure(config) => import config._
       conn.grabKey(exitKey.toByte, translateMod(mod))
       conn.grabKey(closeKey.toByte, translateMod(mod))
@@ -20,6 +20,9 @@ object XAdapter {
       shouldExit = true
     case Command(cmd) =>
       Commands.execute(cmd)
+    case Focus(window) =>
+      conn.bringToFront(window)
+      conn.focusWindow(window)
     case Close(window) =>
       conn.destroyWindow(window)
     case WarpPointer(window, point) =>

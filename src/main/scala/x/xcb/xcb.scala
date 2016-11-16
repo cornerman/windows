@@ -254,6 +254,7 @@ import scala.scalanative.native._, Unsigned._
   def xcb_change_window_attributes(conn: Ptr[xcb_connection_t], window: xcb_window_t, value_mask: CUInt, value_list: Ptr[CUInt]): xcb_void_cookie_t = extern
   def xcb_map_window(conn: Ptr[xcb_connection_t], window: xcb_window_t): xcb_void_cookie_t = extern
   def xcb_destroy_window(conn: Ptr[xcb_connection_t], window: xcb_window_t): xcb_void_cookie_t = extern
+  def xcb_set_input_focus(conn: Ptr[xcb_connection_t], revert_to: CUChar, focus: xcb_window_t, time: xcb_timestamp_t): xcb_void_cookie_t = extern
 
   def xcb_get_geometry(conn: Ptr[xcb_connection_t], drawable: xcb_drawable_t): xcb_get_geometry_cookie_t = extern
   def xcb_get_geometry_unchecked(conn: Ptr[xcb_connection_t], drawable: xcb_drawable_t): xcb_get_geometry_cookie_t = extern
@@ -267,5 +268,5 @@ import scala.scalanative.native._, Unsigned._
   def xcb_query_pointer_reply(conn: Ptr[xcb_connection_t], cookie: xcb_query_pointer_cookie_t, e: Ptr[Ptr[xcb_generic_error_t]]): Ptr[xcb_query_pointer_reply_t] = extern
 
   def xcb_request_check(conn: Ptr[xcb_connection_t], cookie: xcb_void_cookie_t): Ptr[xcb_generic_error_t] = extern
-}
 
+}

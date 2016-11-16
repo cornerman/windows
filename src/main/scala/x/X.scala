@@ -80,6 +80,10 @@ class X(conn: Ptr[xcb_connection_t]) {
   //   xcb_warp_pointer(conn, XCB_NONE, win, 0, 0, 0, 0, 1, 1)
   // }
 
+  def focusWindow(win: xcb_window_t) {
+    xcb_set_input_focus(conn, XCB_INPUT_FOCUS_NONE, win, XCB_CURRENT_TIME)
+  }
+
   def bringToFront(win: xcb_window_t) {
     val values = createValues(1)
     values(0) = XCB_STACK_MODE_ABOVE

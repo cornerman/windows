@@ -13,9 +13,11 @@ object WM {
     var state = State.initial(config)
 
     runner { event =>
-      println(state); println(event)
+      println("STATE:  " + state)
+      println("EVENT:  " + event)
       val (newState, result) = dispatcher(state, event)
-      println(newState); println(result)
+      println("RESULT: " + result)
+      println("====")
       state = newState
       result
     } foreach println
@@ -23,10 +25,8 @@ object WM {
 
   def defaultDispatcher(state: State, event: Event): (State, EventResult) = Reactor.react(state, event) match {
     case Some(action) =>
-      val newState = Interpreter.interpret(state, action)
-      val actions = Layouter.layout(newState, action)
-      val connActions = actions collect { case a: ConnectionAction => a }
-      (newState, EventResult(true,  connActions))
+      val (newState, todos) = Interpreter.interpret(state, action)
+      (newState, EventResult(true,  todos))
     case None => (state, EventResult(false, Seq.empty))
   }
 }

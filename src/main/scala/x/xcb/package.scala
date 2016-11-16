@@ -264,5 +264,11 @@ package object xcb {
   //typedef enum xcb_back_pixmap_t {
   val XCB_BACK_PIXMAP_NONE = 0.toByte
   val XCB_BACK_PIXMAP_PARENT_RELATIVE = 1.toByte
-}
 
+
+  //typedef enum xcb_input_focus_t {
+  val XCB_INPUT_FOCUS_NONE = 0.toByte
+  val XCB_INPUT_FOCUS_POINTER_ROOT = 1.toByte
+  val XCB_INPUT_FOCUS_PARENT = 2.toByte
+  val XCB_INPUT_FOCUS_FOLLOW_KEYBOARD = 3.toByte
+}
