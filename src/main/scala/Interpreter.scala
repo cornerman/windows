@@ -21,7 +21,7 @@ object Interpreter {
     case ModeUpdate(mode) =>
       (s.copy(mode = mode), Seq.empty)
     case LogAction(log) =>
-      println("[LOG] " + log)
+      // println("[LOG] " + log)
       (s, Seq.empty)
     case SetWindowFocus(window, focused) =>
       val next = if (focused) window else 0

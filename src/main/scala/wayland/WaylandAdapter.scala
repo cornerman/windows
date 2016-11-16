@@ -77,28 +77,28 @@ object WaylandAdapter {
     //TODO: why need to inline?
     wlc_log_set_handler(
       (logType: wlc_log_type, msg: CString) => {
-        // handler(LogEvent(Log.Info(fromCString(msg)))) //TODO logtype
+        handler(LogEvent(Log.Info(fromCString(msg)))) //TODO logtype
         ()
       }
     )
 
     wlc_set_output_created_cb(
       (output: wlc_handle) => {
-        // handler(LogEvent(Log.Info("output created")))
+        handler(LogEvent(Log.Info("output created")))
         true
       }
     )
 
     wlc_set_output_destroyed_cb(
       (output: wlc_handle) => {
-        // handler(LogEvent(Log.Info("output destroyed")))
+        handler(LogEvent(Log.Info("output destroyed")))
         ()
       }
     )
 
     wlc_set_output_focus_cb(
       (output: wlc_handle, focus: Boolean) => {
-        // handler(LogEvent(Log.Info("output focus")))
+        handler(LogEvent(Log.Info("output focus")))
         ()
       }
     )
@@ -127,7 +127,7 @@ object WaylandAdapter {
 
     wlc_set_view_move_to_output_cb(
       (view: wlc_handle, from_output: wlc_handle, to_output: wlc_handle) => {
-        // handler(LogEvent(Log.Info("view move to output")))
+        handler(LogEvent(Log.Info("view move to output")))
         ()
       }
     )
