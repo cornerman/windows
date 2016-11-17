@@ -53,9 +53,13 @@ object UnmapNotifyEvent {
 // }
 
 // object ExposeEvent {
-//   def unapply(e: Event) = as[xcb_expose_event_t](e, XCB_EXPOSE)
+//   def unapply(e: EventPtr) = as[xcb_expose_event_t](e, XCB_EXPOSE)
 // }
 
-// object FocusInEvent {
-//   def unapply(e: Event) = as[xcb_focus_in_event_t](e, XCB_FOCUS_IN)
-// }
+object FocusInEvent {
+  def unapply(e: EventPtr) = as[xcb_focus_in_event_t](e, XCB_FOCUS_IN)
+}
+
+object FocusOutEvent {
+  def unapply(e: EventPtr) = as[xcb_focus_out_event_t](e, XCB_FOCUS_OUT)
+}

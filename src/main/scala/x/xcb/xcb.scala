@@ -183,6 +183,16 @@ import scala.scalanative.native._, Unsigned._
     val from_configure: CUChar,
     val pad1: Array[CUChar]) // length 3
 
+  @struct class xcb_focus_in_event_t(
+      val response_type: CUChar,
+      val detail: CUChar,
+      val sequence: CUShort,
+      val event: xcb_window_t,
+      val mode: CUChar,
+      val pad0: Array[CUChar]) // length 3
+
+  type xcb_focus_out_event_t = xcb_focus_in_event_t
+
   @struct class xcb_void_cookie_t(val sequence: CUInt)
   @struct class xcb_get_geometry_cookie_t(val sequence: CUInt)
   @struct class xcb_grab_pointer_cookie_t(val sequence: CUInt)

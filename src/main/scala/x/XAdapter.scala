@@ -49,6 +49,8 @@ object XAdapter {
     case MapRequestEvent(e) => msg.MapRequestEvent((!e).window)
     case MapNotifyEvent(e) => msg.MapNotifyEvent((!e).window)
     case UnmapNotifyEvent(e) => msg.UnmapNotifyEvent((!e).window)
+    case FocusInEvent(e) => msg.FocusEvent((!e).event, true)
+    case FocusOutEvent(e) => msg.FocusEvent((!e).event, false)
     case ErrorEvent(e) => msg.LogEvent(Log.Error(s"X11 error: ${(!e).error_code}"))
   }
 
